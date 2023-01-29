@@ -45,4 +45,4 @@ class TestClient(unittest.TestCase):
             {"first_name": "Cyril", "last_name": "Cibulka", "date_of_birth": "3.10.1933", "phone": "333333333"},
             {"first_name": "David", "last_name": "Doškář", "date_of_birth": "14.12.1944", "phone": "44 4444 444"}
         ]
-        self.viewInstance.print_all_insured(data)
+        self.viewInstance.print_insured_table(data)
