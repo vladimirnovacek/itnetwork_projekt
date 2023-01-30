@@ -114,7 +114,7 @@ class View:
         :param data: list of dictionaries
         :return:
         """
-        width = (32, 32, 8, 16)
+        width = (26, 26, 8, 15)
         column_names = ("Jméno", "Příjmení", "Věk", "Telefon")
         line_separator = "+"
         header = "|"
