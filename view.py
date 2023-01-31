@@ -1,19 +1,7 @@
 import datetime
 import re
-import typing
 
-
-class InputProcessor(typing.Protocol):
-    """
-    Protocol class for input processing.
-    """
-    def process_user_input(self, **kwargs: str | bool) -> None:
-        """
-        Method is called by View that passes user inputs. It isn't meant to be called directly.
-        :param kwargs: user inputs
-        :return:
-        """
-        ...
+from interfaces import InputProcessor
 
 
 class View:
@@ -41,9 +29,9 @@ class View:
             "4 - Konec\n"
         )
         try:
-            action = input(">> ")
-            if 1 <= int(action) <= 4:
-                self.processor.process_user_input(menu_action=action)
+            action = int(input(">> "))
+            if 1 <= action <= 4:
+                self.processor.select_action(action)
             else:
                 raise ValueError
         except (TypeError, ValueError):
@@ -69,8 +57,8 @@ class View:
         }
         kwargs = {}
         for pname, prompt in prompts.items():
-            kwargs[pname] = self.__get_input(pname, prompt, errors[pname])
-        self.processor.process_user_input(**kwargs)
+            kwargs[pname] = self.__get_input(pname, prompt, errors[pname]).strip()
+        self.processor.add_insured(**kwargs)
 
     @staticmethod
     def __get_input(pname, prompt, error):
@@ -90,6 +78,7 @@ class View:
             if pname == "date_of_birth":
                 try:
                     if datetime.datetime.strptime(answer, "%d.%m.%Y") > datetime.datetime.now():
+                        # this checks both validity of the date and of its format, since strptime can raise ValueError
                         raise ValueError
                 except ValueError:
                     print(error)
@@ -137,11 +126,9 @@ class View:
         Prints dialog for finding an insured by their name. User input is passed to the input processor.
         :return:
         """
-        name = {
-            "first_name": input("Zadejte křestní jméno: "),
-            "last_name": input("Zadejte příjmení: ")
-        }
-        self.processor.process_user_input(**name)
+        first_name = input("Zadejte křestní jméno: ").strip()
+        last_name = input("Zadejte příjmení: ").strip()
+        self.processor.search_insured(first_name, last_name)
 
     def print_operation_unsuccessful(self) -> None:
         """
@@ -149,7 +136,7 @@ class View:
         :return:
         """
         print("Operace se nezdařila.")
-        self.processor.process_user_input(dialog_over=True)
+        self.__dialog_over()
 
     def __dialog_over(self) -> None:
         """
@@ -158,7 +145,6 @@ class View:
         """
         print("Pokračujte klávesou ENTER...")
         input()
-        self.processor.process_user_input(dialog_over=True)
 
     def __str__(self):
         return "View object for command line interface"

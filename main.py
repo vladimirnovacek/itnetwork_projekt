@@ -1,8 +1,8 @@
 import datetime
 
-from controller.controller import Controller
-from model.simple_client_database import SimpleClientDB, Client
-from view.view import View
+from controller import Controller
+from simple_client_database import SimpleClientDB, Client
+from view import View
 
 
 def main():
