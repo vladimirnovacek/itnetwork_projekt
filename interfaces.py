@@ -3,6 +3,9 @@ from typing import Protocol
 
 
 class SimpleDatabase(Protocol):
+    """
+    Protocol class offering the interface to a database.
+    """
 
     def add_client(self, first_name: str, last_name: str, date_of_birth: datetime.date, phone: str) -> None:
         """

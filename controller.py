@@ -60,7 +60,7 @@ class Controller:
             date_of_birth = datetime.datetime.strptime(date_of_birth, "%d.%m.%Y").date()
             self.model.add_client(first_name, last_name, date_of_birth, phone)
             self.view.print_insured_saved()
-        except KeyError:
+        except ValueError:
             self.view.print_operation_unsuccessful()
 
     def search_insured(self, first_name: str, last_name: str):
@@ -70,10 +70,7 @@ class Controller:
         :param last_name:
         :return:
         """
-        try:
-            clients = self.model.get_clients_by_name(first_name, last_name)
-        except AttributeError:
-            clients = None
+        clients = self.model.get_clients_by_name(first_name, last_name)
         self.view.print_insured_table(clients)
 
     def __str__(self):
