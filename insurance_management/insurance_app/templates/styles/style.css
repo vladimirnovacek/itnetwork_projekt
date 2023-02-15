@@ -1,0 +1,27 @@
+/*
+/* Color Theme Swatches in Hex
+.Poseidon-1-hex { color: #DAFDBA; }
+.Poseidon-2-hex { color: #9AEBA3; }
+.Poseidon-3-hex { color: #45C4B0; }
+.Poseidon-4-hex { color: #13678A; }
+.Poseidon-5-hex { color: #012030; }
+
+/* Color Theme Swatches in RGBA
+.Poseidon-1-rgba { color: rgba(217, 252, 186, 1); }
+.Poseidon-2-rgba { color: rgba(153, 234, 162, 1); }
+.Poseidon-3-rgba { color: rgba(68, 196, 175, 1); }
+.Poseidon-4-rgba { color: rgba(18, 103, 138, 1); }
+.Poseidon-5-rgba { color: rgba(0, 32, 48, 1); }
+
+/* Color Theme Swatches in HSLA
+.Poseidon-1-hsla { color: hsla(91, 94, 86, 1); }
+.Poseidon-2-hsla { color: hsla(126, 66, 76, 1); }
+.Poseidon-3-hsla { color: hsla(170, 52, 52, 1); }
+.Poseidon-4-hsla { color: hsla(197, 76, 30, 1); }
+.Poseidon-5-hsla { color: hsla(200, 96, 9, 1); }
+*/
+
+h1 {
+    color: #13678a;
+    background-color: #9aeba3;
+}
