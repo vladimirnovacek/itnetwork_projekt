@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+{% for product in active %}
+    <section>
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.description }}</p>
+    </section>
+{% empty %}
+    <section>
+        <p>Momentálně nenabízíme žádný druh pojištění</p>
+    </section>
+{% endfor %}
+
+{% if inactive %}
+    <h4>Již nenabízíme</h4>
+
+{% for product in inactive %}
+    <p>{{ product.name }}</p>
+{% endfor %}
+
+{% endif %}
+
+
+{% endblock %}

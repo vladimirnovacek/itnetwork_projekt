@@ -1,0 +1,17 @@
+/*
+barvy:
+    #a36864
+    #fffffe
+    #b3948d 179 148 141
+    #cca797
+    #d0b4ac 208 180 172
+*/
+
+body {
+    background: #fffffe;
+}
+
+.img-brand {
+    height: 40px;
+    padding: 10px 20px 10px 0;
+}

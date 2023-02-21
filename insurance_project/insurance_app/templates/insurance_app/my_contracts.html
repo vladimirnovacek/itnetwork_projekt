@@ -1,0 +1,13 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    {% for obj in object_list %}
+    <a href="#" class="text-decoration-none link-dark">
+        <section class="bg-secondary hover-overlay border border-2 rounded-2 p-3 m-3" data-mdb-ripple-color="light">
+            <h1>{{ obj.product.name }}</h1>
+            <p>Číslo smlouvy: {{ obj.contract_number }}</p>
+            <div class="mask" style="background-color: hsla(0, 0%, 98%, 0.2)"></div>
+        </section>
+    </a>
+    {% endfor %}
+{% endblock %}

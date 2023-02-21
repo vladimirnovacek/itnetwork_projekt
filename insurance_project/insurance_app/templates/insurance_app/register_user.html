@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>User form</h1>
+    <hr>
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4">
+        <section class="login-form">
+
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="container-fluid">
+                    {{ form_user }}
+                    <hr />
+                    {{ form_address }}
+
+                    <button type="submit" class="btn btn-lg btn-primary btn-block" value="Login">Submit</button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="col-md-4"></div>
+</body>
+</html>

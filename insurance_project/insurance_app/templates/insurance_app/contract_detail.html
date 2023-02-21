@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <section>
+        <h1>{{ obj.name }}</h1>
+        <p>Číslo smlouvy: {{ obj.contract_number }}</p>
+        <p>Založeno dne: {{ obj.conclusion_date }}</p>
+        <p>Roční pojistné: {{ obj.payment }}</p>
+        <form method="post">
+            <button name="edit">Změnit smlouvu</button>
+            <button name="delete">Ukončit smlouvu</button>
+        </form>
+    </section>
+{% endblock %}
