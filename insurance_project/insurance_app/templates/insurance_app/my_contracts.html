@@ -2,7 +2,7 @@
 
 {% block content %}
     {% for obj in object_list %}
-    <a href="#" class="text-decoration-none link-dark">
+    <a href="{% url 'contract-detail' contract_number=obj.contract_number %}" class="text-decoration-none link-dark">
         <section class="bg-secondary hover-overlay border border-2 rounded-2 p-3 m-3" data-mdb-ripple-color="light">
             <h1>{{ obj.product.name }}</h1>
             <p>Číslo smlouvy: {{ obj.contract_number }}</p>

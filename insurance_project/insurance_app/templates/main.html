@@ -46,7 +46,7 @@
                     </ul>
                     {% if user.is_authenticated %}
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'my_contracts' %}">Moje smlouvy</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'my-contracts' %}">Moje smlouvy</a></li>
                         <li class="nav-item"><span class="h-100 text-center text-secondary">Přihlášený uživatel: {{ user.username }}</span></li>
                         <li class="nav-item"><a class="nav-link btn btn-primary" href="{% url 'logout' %}?next={{ request.path|escape }}">Odhlásit</a></li>
                         {% else %} <li class="nav-item"><a class="btn btn-primary" href="{% url 'login' %}">Login</a></li>

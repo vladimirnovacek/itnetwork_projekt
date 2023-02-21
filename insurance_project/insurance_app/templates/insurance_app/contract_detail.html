@@ -2,11 +2,12 @@
 
 {% block content %}
     <section>
-        <h1>{{ obj.name }}</h1>
+        <h1>{{ obj.product }}</h1>
         <p>Číslo smlouvy: {{ obj.contract_number }}</p>
         <p>Založeno dne: {{ obj.conclusion_date }}</p>
-        <p>Roční pojistné: {{ obj.payment }}</p>
+        <p>Roční pojistné: {{ obj.payment }} Kč</p>
         <form method="post">
+            {% csrf_token %}
             <button name="edit">Změnit smlouvu</button>
             <button name="delete">Ukončit smlouvu</button>
         </form>

@@ -1,8 +1,8 @@
-from django.contrib.auth import login, logout
+from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest, Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
@@ -12,6 +12,7 @@ from . import forms, models
 HOME_TEMPLATE = "insurance_app/home.html"
 FORM_TEMPLATE = "insurance_app/dummy_form_template.html"
 CONTRACTS_TEMPLATE = "insurance_app/my_contracts.html"
+CONTRACT_DETAIL_TEMPLATE = "insurance_app/contract_detail.html"
 
 
 class IndexView(generic.ListView):
@@ -81,11 +82,11 @@ class RegisterInsuranceView(generic.edit.CreateView):
 
 
 class LoginView(auth_views.LoginView):
-    next_page = "my_contracts"
+    next_page = "my-contracts"
 
 
 class ContractsView(LoginRequiredMixin, generic.ListView):
-    model = models.Insurance
+    model = models.Contract
     template_name = CONTRACTS_TEMPLATE
 
     def get(self, request, *args, **kwargs):
@@ -95,7 +96,20 @@ class ContractsView(LoginRequiredMixin, generic.ListView):
 
 
 class ContractDetailView(generic.DetailView):
-    model = models.Insurance
+    model = models.Contract
+    template_name = CONTRACT_DETAIL_TEMPLATE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return render(request, self.template_name, {"obj": self.object})
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        self.object = self.get_object()
+        if "edit" in request.POST:
+            pass
+        if "delete" in request.POST:
+            self.__delete_object()
+            return redirect("my-contracts")
 
     def get_object(self, queryset=None):
         if queryset is None:
@@ -124,12 +138,12 @@ class ContractDetailView(generic.DetailView):
             obj = queryset.get()
         except queryset.model.DoesNotExist:
             raise Http404(
-                _("No %(verbose_name)s found matching the query")
+                "No %(verbose_name)s found matching the query"
                 % {"verbose_name": queryset.model._meta.verbose_name}
             )
         return obj
 
-
-def logout_user(request: HttpRequest):
-    if request.user.is_authenticated:
-        logout(request)
+    def __delete_object(self):
+        if not self.object:
+            return
+        self.object.delete()

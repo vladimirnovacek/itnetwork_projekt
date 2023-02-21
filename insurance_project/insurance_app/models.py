@@ -1,5 +1,3 @@
-import math
-
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -29,7 +27,7 @@ class Product(models.Model):
         return str(self.name) + inactive
 
 
-class Insurance(models.Model):
+class Contract(models.Model):
     product = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
     insured = models.ForeignKey(to=User, on_delete=models.RESTRICT)
     conclusion_date = models.DateTimeField(auto_now_add=True)
@@ -49,3 +47,8 @@ class Insurance(models.Model):
 
     def __str__(self):
         return f"{self.product}, klient: {self.insured}"
+
+
+# class DeletedContract(Contract):
+#     def __str__(self):
+#         return super(DeletedContract, self).__str__() + "(zrušeno)"

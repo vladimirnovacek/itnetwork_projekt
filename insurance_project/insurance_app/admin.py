@@ -5,5 +5,5 @@ from . import models
 
 admin.register(User, Group)
 admin.site.register(models.Person)
-admin.site.register(models.Insurance)
+admin.site.register(models.Contract)
 admin.site.register(models.Product)

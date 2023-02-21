@@ -25,5 +25,5 @@ class RegisterUserDetailsForm(forms.ModelForm):
 class RegisterInsurance(forms.ModelForm):
 
     class Meta:
-        model = models.Insurance
+        model = models.Contract
         fields = ['product']
