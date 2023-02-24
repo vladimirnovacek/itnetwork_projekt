@@ -28,6 +28,7 @@ class Product(models.Model):
 
 
 class Contract(models.Model):
+    objects: models.Manager
     product = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
     insured = models.ForeignKey(to=User, on_delete=models.RESTRICT)
     conclusion_date = models.DateTimeField(auto_now_add=True)

@@ -42,7 +42,7 @@ class RegisterUserView(generic.CreateView):
         return reverse("register-detail")
 
 
-class RegisterUserDetailView(generic.edit.CreateView):
+class RegisterUserDetailView(generic.CreateView):
     form_class = forms.RegisterUserDetailsForm
     template_name = FORM_TEMPLATE
 
@@ -62,10 +62,17 @@ class RegisterUserDetailView(generic.edit.CreateView):
         return self.get_success_url()
 
     def get_success_url(self):
-        return reverse("register-insurance")
+        return reverse("register-contract")
 
 
-class RegisterInsuranceView(generic.edit.CreateView):
+class UpdateUserView(generic.UpdateView):
+    form_class = FORM_TEMPLATE
+
+class LoginView(auth_views.LoginView):
+    next_page = "my-contracts"
+
+
+class RegisterContractView(generic.CreateView):
     form_class = forms.RegisterInsurance
     template_name = FORM_TEMPLATE
 
@@ -78,11 +85,48 @@ class RegisterInsuranceView(generic.edit.CreateView):
         return self.get_success_url()
 
     def get_success_url(self):
-        return reverse("home")
+        return reverse("my-contracts")
 
 
-class LoginView(auth_views.LoginView):
-    next_page = "my-contracts"
+class UpdateContractView(generic.UpdateView):
+    form_class = forms.UpdateInsurance
+    template_name = FORM_TEMPLATE
+    model = models.Contract
+
+    def get_success_url(self):
+        return reverse("my-contracts")
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        contract_number = self.kwargs.get("contract_number")
+        pk = self.model.get_pk_by_contract_number(contract_number)
+        slug = self.kwargs.get(self.slug_url_kwarg)
+        if pk is not None:
+            queryset = queryset.filter(pk=pk)
+
+        # Next, try looking up by slug.
+        if slug is not None and (pk is None or self.query_pk_and_slug):
+            slug_field = self.get_slug_field()
+            queryset = queryset.filter(**{slug_field: slug})
+
+        # If none of those are defined, it's an error.
+        if pk is None and slug is None:
+            raise AttributeError(
+                "Generic detail view %s must be called with either an object "
+                "pk or a slug in the URLconf." % self.__class__.__name__
+            )
+
+        try:
+            # Get the single item from the filtered queryset
+            obj = queryset.get()
+        except queryset.model.DoesNotExist:
+            raise Http404(
+                "No %(verbose_name)s found matching the query"
+                % {"verbose_name": queryset.model._meta.verbose_name}
+            )
+        return obj
 
 
 class ContractsView(LoginRequiredMixin, generic.ListView):
@@ -106,7 +150,7 @@ class ContractDetailView(generic.DetailView):
     def post(self, request: HttpRequest, *args, **kwargs):
         self.object = self.get_object()
         if "edit" in request.POST:
-            pass
+            return redirect("contract-update", self.object.contract_number)
         if "delete" in request.POST:
             self.__delete_object()
             return redirect("my-contracts")

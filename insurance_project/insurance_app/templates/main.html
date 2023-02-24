@@ -29,7 +29,7 @@
                             <a class="nav-link" aria-current="page" href="{% url 'home' %}">Hlavní strana</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Založit pojištění</a>
+                            <a class="nav-link" href="{% if user.is_authenticated %}{% url 'register-contract' %}{% else %}{% url 'register' %}{% endif %}">Založit pojištění</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

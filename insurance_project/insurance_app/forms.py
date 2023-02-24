@@ -23,7 +23,16 @@ class RegisterUserDetailsForm(forms.ModelForm):
 
 
 class RegisterInsurance(forms.ModelForm):
+    model = models.Contract
+    product = forms.ModelChoiceField(queryset=models.Product.objects.filter(active=True))
 
     class Meta:
         model = models.Contract
-        fields = ['product']
+        fields = ["product", "payment"]
+
+
+class UpdateInsurance(forms.ModelForm):
+
+    class Meta:
+        model = models.Contract
+        fields = ["payment"]

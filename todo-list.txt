@@ -1,0 +1,5 @@
+Check registering duplicite user
+User details update
+Backoffice functionality: create, update, delete users, contracts
+
+If user removes his last contract, should they be logged out and deleted?
