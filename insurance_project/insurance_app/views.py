@@ -66,7 +66,21 @@ class RegisterUserDetailView(generic.CreateView):
 
 
 class UpdateUserView(generic.UpdateView):
-    form_class = FORM_TEMPLATE
+    form_class = forms.UpdateUserForm
+    template_name = FORM_TEMPLATE
+    model = form_class.Meta.model
+
+    def get(self, request: HttpRequest, *args, **kwargs):
+        form = self.form_class(instance=self.model.objects.get(user=request.user))
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, instance=self.model.objects.get(user=request.user))
+        if form.is_valid():
+            form.save()
+            return redirect("my-contracts")
+
+
 
 class LoginView(auth_views.LoginView):
     next_page = "my-contracts"

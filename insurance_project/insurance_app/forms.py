@@ -15,6 +15,13 @@ class RegisterUserForm(UserCreationForm):
         fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
 
 
+class UpdateUserForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Person
+        fields = ["phone", "address1", "address2", "postal_code", "city", "country"]
+
+
 class RegisterUserDetailsForm(forms.ModelForm):
 
     class Meta:

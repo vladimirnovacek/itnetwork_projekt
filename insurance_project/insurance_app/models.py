@@ -6,7 +6,7 @@ from phonenumber_field import modelfields
 
 class Person(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
-    phone = modelfields.PhoneNumberField()
+    phone = modelfields.PhoneNumberField(region="CZ")
     address1 = models.CharField(max_length=150)
     address2 = models.CharField(max_length=150, blank=True, default="")
     postal_code = models.CharField(max_length=12)
