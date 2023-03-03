@@ -76,7 +76,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'insurance_project.insurance_app.models.EmailBackend'
+    'insurance_project.insurance_app.backends.EmailBackend'
 ]
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# AUTH_USER_MODEL = "insurance_app.Person"
+AUTH_USER_MODEL = "insurance_app.Person"
 
 LOGIN_URL = "muj-ucet/login/"
 

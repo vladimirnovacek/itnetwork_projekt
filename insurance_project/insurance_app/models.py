@@ -1,24 +1,59 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import User
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.hashers import make_password
 from django.db import models
 
 from phonenumber_field import modelfields
 
 
+class PersonManager(BaseUserManager):
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Create and save a user with the given username, email, and password.
+        """
+        if not email:
+            raise ValueError("The given e-mail must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.password = make_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(email, password, **extra_fields)
+
+
 class Person(AbstractBaseUser):
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name", "date_of_birth"]
+
+    objects = PersonManager()
+
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
-    phone = modelfields.PhoneNumberField(region="CZ")
-    address1 = models.CharField(max_length=150)
+    phone = modelfields.PhoneNumberField(region="CZ", null=True)
+    address1 = models.CharField(max_length=150, default="")
     address2 = models.CharField(max_length=150, blank=True, default="")
-    postal_code = models.CharField(max_length=12)
-    city = models.CharField(max_length=150)
-    country = models.CharField(max_length=150)
+    postal_code = models.CharField(max_length=12, default="")
+    city = models.CharField(max_length=150, default="")
+    country = models.CharField(max_length=150, default="")
     date_of_birth = models.DateField()
     is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     slug = models.SlugField(unique=True, null=False)
 
     @property
@@ -45,19 +80,6 @@ class Person(AbstractBaseUser):
         return f"{self.last_name} {self.first_name}"
 
 
-class EmailBackend(ModelBackend):
-    def authenticate(self, request, username=None, password=None, **kwargs):
-        user_model = get_user_model()
-        try:
-            user = user_model.objects.get(email=username)
-        except Exception as e:
-            raise e
-        else:
-            if user.check_password(password):
-                return user
-        return None
-
-
 class Product(models.Model):
     name = models.CharField(max_length=64, unique=True)
     description = models.TextField(default="")
@@ -71,7 +93,7 @@ class Product(models.Model):
 class Contract(models.Model):
     objects: models.Manager
     product = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
-    insured = models.ForeignKey(to=User, on_delete=models.RESTRICT)
+    insured = models.ForeignKey(to=Person, on_delete=models.RESTRICT)
     conclusion_date = models.DateTimeField(auto_now_add=True)
     payment = models.IntegerField()
 
