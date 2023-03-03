@@ -13,6 +13,7 @@ import os.path
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -74,6 +75,10 @@ TEMPLATES = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'insurance_project.insurance_app.models.EmailBackend'
+]
+
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 WSGI_APPLICATION = 'insurance_project.wsgi.application'
@@ -106,6 +111,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# AUTH_USER_MODEL = "insurance_app.Person"
 
 LOGIN_URL = "muj-ucet/login/"
 

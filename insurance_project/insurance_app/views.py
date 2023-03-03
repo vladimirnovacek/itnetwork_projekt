@@ -1,10 +1,9 @@
 from django.contrib.auth import login
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, Http404
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 
 from . import forms, models
@@ -13,6 +12,7 @@ HOME_TEMPLATE = "insurance_app/home.html"
 FORM_TEMPLATE = "insurance_app/dummy_form_template.html"
 CONTRACTS_TEMPLATE = "insurance_app/my_contracts.html"
 CONTRACT_DETAIL_TEMPLATE = "insurance_app/contract_detail.html"
+CLIENT_LIST_TEMPLATE = "insurance_app/clients_list.html"
 
 
 class IndexView(generic.ListView):
@@ -20,9 +20,9 @@ class IndexView(generic.ListView):
     template_name = HOME_TEMPLATE
 
     def get(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset()
-        active = self.object_list.filter(active=True)
-        inactive = self.object_list.filter(active=False)
+        object_list = self.get_queryset()
+        active = object_list.filter(active=True)
+        inactive = object_list.filter(active=False)
         return render(request, self.template_name, {"active": active, "inactive": inactive})
 
 
@@ -46,20 +46,14 @@ class RegisterUserDetailView(generic.CreateView):
     form_class = forms.RegisterUserDetailsForm
     template_name = FORM_TEMPLATE
 
-    @login_required
-    def get(self, request, *args, **kwargs):
-        return super(RegisterUserDetailView, self).get(request, *args, **kwargs)
-
-    @login_required
     def post(self, request: HttpRequest, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            pass
-        if hasattr(request, "user"):
-            person = form.save(commit=False)
-            person.user = request.user
-            person.save()
-        return self.get_success_url()
+            if hasattr(request, "user"):
+                person = form.save(commit=False)
+                person.user = request.user
+                person.save()
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse("register-contract")
@@ -81,14 +75,18 @@ class UpdateUserView(generic.UpdateView):
             return redirect("my-contracts")
 
 
-
 class LoginView(auth_views.LoginView):
     next_page = "my-contracts"
+
+
+class PasswordChangeView(auth_views.PasswordChangeView):
+    template_name = FORM_TEMPLATE
 
 
 class RegisterContractView(generic.CreateView):
     form_class = forms.RegisterInsurance
     template_name = FORM_TEMPLATE
+    success_url = reverse_lazy("my-contracts")
 
     def post(self, request: HttpRequest, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -96,10 +94,10 @@ class RegisterContractView(generic.CreateView):
             contract = form.save(commit=False)
             contract.insured = request.user
             contract.save()
-        return self.get_success_url()
-
-    def get_success_url(self):
-        return reverse("my-contracts")
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 class UpdateContractView(generic.UpdateView):
@@ -161,7 +159,7 @@ class ContractDetailView(generic.DetailView):
         self.object = self.get_object()
         return render(request, self.template_name, {"obj": self.object})
 
-    def post(self, request: HttpRequest, *args, **kwargs):
+    def post(self, request: HttpRequest):
         self.object = self.get_object()
         if "edit" in request.POST:
             return redirect("contract-update", self.object.contract_number)
@@ -205,3 +203,15 @@ class ContractDetailView(generic.DetailView):
         if not self.object:
             return
         self.object.delete()
+
+
+class ClientListView(generic.ListView):
+    model = models.Person
+    template_name = CLIENT_LIST_TEMPLATE
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        else:
+            return super().get(request, *args, **kwargs)
+

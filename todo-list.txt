@@ -1,5 +1,7 @@
 Check registering duplicite user
-User details update
+Create static page saying that password change was successful
 Backoffice functionality: create, update, delete users, contracts
-
 If user removes his last contract, should they be logged out and deleted?
+Check if the payment is positive
+Redo login so people log in via Person model, not User
+Add slug field to person
