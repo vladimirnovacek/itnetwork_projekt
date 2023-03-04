@@ -1,5 +1,6 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
 from phonenumber_field import modelfields
@@ -35,7 +36,7 @@ class PersonManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Person(AbstractBaseUser):
+class Person(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "date_of_birth"]
@@ -66,12 +67,19 @@ class Person(AbstractBaseUser):
             str(self.country)
         ))
 
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
+
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
-        if not self.slug:
-            self.slug = self._get_slug()
-        return super().save(force_insert, force_update, using, update_fields)
+        new_person = super().save(commit=False)
+        if not new_person.slug:
+            new_person.slug = new_person._get_slug()
+        return new_person.save(force_insert, force_update, using, update_fields)
 
     def _get_slug(self):
         return f"{self.pk}-{self.last_name}-{self.first_name}"
