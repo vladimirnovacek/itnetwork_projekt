@@ -1,3 +1,5 @@
+import unicodedata
+
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import PermissionsMixin
@@ -78,11 +80,16 @@ class Person(AbstractBaseUser, PermissionsMixin):
     ):
         new_person = super().save(commit=False)
         if not new_person.slug:
-            new_person.slug = new_person._get_slug()
+            new_person.slug = new_person._generate_slug()
         return new_person.save(force_insert, force_update, using, update_fields)
 
-    def _get_slug(self):
-        return f"{self.pk}-{self.last_name}-{self.first_name}"
+    def _generate_slug(self):
+        last_name = self._remove_interpunction(str(self.last_name))
+        first_name = self._remove_interpunction(str(self.first_name))
+        return f"{self.pk}-{last_name}-{first_name}"
+
+    def _remove_interpunction(self, text: str):
+        return unicodedata.normalize("NFKD", text).encode("ASCII", "ignore")
 
     def __str__(self):
         return f"{self.last_name} {self.first_name}"
