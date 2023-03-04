@@ -1,18 +1,15 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 
 from . import models
 
 
-class RegisterUserForm(UserCreationForm):
-    first_name = forms.CharField(max_length=150)
-    last_name = forms.CharField(max_length=150)
-    email = forms.EmailField()
+class RegisterPersonForm(UserCreationForm):
 
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
+    class Meta:
+        model = models.Person
+        fields = ['email', 'password1', 'password2', 'first_name', 'last_name', 'date_of_birth', 'phone', 'address1',
+                  'address2', 'city', 'postal_code', 'country']
 
 
 class UpdateUserForm(forms.ModelForm):
@@ -20,13 +17,6 @@ class UpdateUserForm(forms.ModelForm):
     class Meta:
         model = models.Person
         fields = ["phone", "address1", "address2", "postal_code", "city", "country"]
-
-
-class RegisterUserDetailsForm(forms.ModelForm):
-
-    class Meta:
-        model = models.Person
-        fields = ["address1", "address2", "postal_code", "city", "country", "phone"]
 
 
 class RegisterInsurance(forms.ModelForm):

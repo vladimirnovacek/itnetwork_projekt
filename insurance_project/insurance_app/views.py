@@ -27,8 +27,13 @@ class IndexView(generic.ListView):
 
 
 class RegisterUserView(generic.CreateView):
-    form_class = forms.RegisterUserForm
+    form_class = forms.RegisterPersonForm
     template_name = FORM_TEMPLATE
+    title = 'Registrace'
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form, 'title': self.title})
 
     def post(self, request: HttpRequest, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -36,24 +41,7 @@ class RegisterUserView(generic.CreateView):
             new_user = form.save()
             login(request, new_user)
             return redirect(self.get_success_url())
-        return render(request, self.template_name, {"form": form})
-
-    def get_success_url(self):
-        return reverse("register-detail")
-
-
-class RegisterUserDetailView(generic.CreateView):
-    form_class = forms.RegisterUserDetailsForm
-    template_name = FORM_TEMPLATE
-
-    def post(self, request: HttpRequest, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            if hasattr(request, "user"):
-                person = form.save(commit=False)
-                person.user = request.user
-                person.save()
-        return redirect(self.get_success_url())
+        return render(request, self.template_name, {"form": form, 'title': self.title})
 
     def get_success_url(self):
         return reverse("register-contract")
@@ -214,4 +202,3 @@ class ClientListView(generic.ListView):
             raise Http404
         else:
             return super().get(request, *args, **kwargs)
-
