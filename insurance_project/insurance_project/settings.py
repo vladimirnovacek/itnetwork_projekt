@@ -76,7 +76,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'insurance_project.insurance_app.backends.EmailBackend'
+    'insurance_app.backends.EmailBackend'
 ]
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
