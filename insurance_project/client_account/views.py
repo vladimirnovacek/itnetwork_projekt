@@ -42,14 +42,15 @@ class ContractDetailView(generic.DetailView):
     model = models.Contract
     template_name = template.CONTRACT_DETAIL
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args, **kwargs):
         self.object = self.get_object()
         return render(request, self.template_name, {"obj": self.object})
 
-    def post(self, request: HttpRequest):
+    def post(self, request: HttpRequest, *args, **kwargs):
         self.object = self.get_object()
+        contract_number = kwargs.get('contract_number', self.object.contract_number)
         if "edit" in request.POST:
-            return redirect("contract-update", self.object.contract_number)
+            return redirect("contract-update", contract_number)
         if "delete" in request.POST:
             self.__delete_object()
             return redirect("my-contracts")
