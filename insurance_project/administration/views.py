@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.shortcuts import render
+from django.urls import reverse
 from django.views import generic
 
 from administration import forms
@@ -17,6 +18,19 @@ class ProductsListView(generic.ListView):
         active = object_list.filter(active=True)
         inactive = object_list.filter(active=False)
         return render(request, self.template_name, {"active": active, "inactive": inactive, 'title': self.title})
+
+
+class ProductCreateView(generic.CreateView):
+    form_class = forms.ProductCreateForm
+    model = models.Product
+    template_name = template.FORM
+    title = 'Nový produkt'
+
+    def get(self, request, *args, **kwargs):
+        return super(ProductCreateView, self).get(request, *args, title=self.title, **kwargs)
+
+    def get_success_url(self):
+        return reverse('products-list')
 
 
 class ProductUpdateView(generic.UpdateView):

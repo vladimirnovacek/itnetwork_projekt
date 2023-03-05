@@ -23,7 +23,7 @@
     {% endif %}
     </tbody>
 </table>
-<a class="btn btn-primary" href="#">Přidat produkt</a>
+<a class="btn btn-primary" href="{% url 'product-create' %}">Přidat produkt</a>
 {% if inactive.0 %}
 <h3>Neaktivní produkty</h3>
 <table class="table table-hover">
