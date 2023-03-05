@@ -11,7 +11,7 @@ from insurance_app import models
 from insurance_project import template_names as template
 
 
-class ContractsView(LoginRequiredMixin, generic.ListView):
+class ContractsListView(LoginRequiredMixin, generic.ListView):
     model = models.Contract
     template_name = template.CONTRACTS
 
