@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import generic
 
@@ -43,6 +43,15 @@ class ProductUpdateView(generic.UpdateView):
         self.object = self.get_object()
         return self.render_to_response(self.get_context_data(title=self.object.name))
 
+
+class ProductDeleteView(generic.UpdateView):
+    model = models.Product
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.active = False
+        self.object.save()
+        return redirect('products-list')
 
 class ClientListView(generic.ListView):
     model = models.Person
