@@ -143,11 +143,11 @@ class UpdateUserView(generic.UpdateView):
     model = form_class.Meta.model
 
     def get(self, request: HttpRequest, *args, **kwargs):
-        form = self.form_class(instance=self.model.objects.get(user=request.user))
+        form = self.form_class(instance=self.model.objects.get(pk=request.user.pk))
         return render(request, self.template_name, {"form": form})
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, instance=self.model.objects.get(user=request.user))
+        form = self.form_class(request.POST, instance=self.model.objects.get(pk=request.user.pk))
         if form.is_valid():
             form.save()
             return redirect("my-contracts")
