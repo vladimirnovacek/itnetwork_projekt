@@ -18,5 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('', include('insurance_app.urls')),
+    path('muj-ucet/', include('client_account.urls')),
+    path('sprava/', include('administration.urls')),
     path('admin/', admin.site.urls),
 ]

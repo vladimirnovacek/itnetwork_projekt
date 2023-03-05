@@ -34,6 +34,8 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 INSTALLED_APPS = [
     # local apps
     "insurance_app",
+    'client_account',
+    'administration',
     # 3rd party
     "crispy_forms",
     "crispy_bootstrap4",
