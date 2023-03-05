@@ -13,7 +13,7 @@
     {% if active.0 %}
     {% for obj in active %}
         <tr>
-            <td><a href="#">{{ obj.name }}</a></td>
+            <td><a href="{% url 'product-update' pk=obj.pk %}">{{ obj.name }}</a></td>
             <td>{{ obj.description }}</td>
         </tr>
     {% endfor %}

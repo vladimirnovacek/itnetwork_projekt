@@ -2,6 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.views import generic
 
+from administration import forms
 from insurance_app import models
 from insurance_project import template_names as template
 
@@ -16,6 +17,16 @@ class ProductsListView(generic.ListView):
         active = object_list.filter(active=True)
         inactive = object_list.filter(active=False)
         return render(request, self.template_name, {"active": active, "inactive": inactive, 'title': self.title})
+
+
+class ProductUpdateView(generic.UpdateView):
+    form_class = forms.ProductUpdateForm
+    model = models.Product
+    template_name = template.FORM
+
+    def get(self, request, *args, **kwargs):
+        title = self.get_object().name
+        return super().get(request, *args, title=title, **kwargs)
 
 
 class ClientListView(generic.ListView):
