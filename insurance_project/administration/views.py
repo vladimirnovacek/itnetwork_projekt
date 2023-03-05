@@ -27,7 +27,8 @@ class ProductCreateView(generic.CreateView):
     title = 'Nový produkt'
 
     def get(self, request, *args, **kwargs):
-        return super(ProductCreateView, self).get(request, *args, title=self.title, **kwargs)
+        self.object = None
+        return self.render_to_response(self.get_context_data(title=self.title))
 
     def get_success_url(self):
         return reverse('products-list')
@@ -39,8 +40,8 @@ class ProductUpdateView(generic.UpdateView):
     template_name = template.FORM
 
     def get(self, request, *args, **kwargs):
-        title = self.get_object().name
-        return super().get(request, *args, title=title, **kwargs)
+        self.object = self.get_object()
+        return self.render_to_response(self.get_context_data(title=self.object.name))
 
 
 class ClientListView(generic.ListView):
