@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.db.models import RestrictedError
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -58,16 +60,24 @@ class ClientListView(generic.ListView):
     model = models.Person
     queryset = models.Person.objects.filter(is_staff=False)
     template_name = template.CLIENT_LIST
+    title = "Seznam klientů"
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_staff:
             raise Http404
         else:
+            request.title = self.title
             return super().get(request, *args, **kwargs)
 
 
 def delete_person(request, pk):
     person = get_object_or_404(models.Person, pk=pk)
-    if not models.Contract.objects.get(insured=person):
+    try:
         person.delete()
-    return redirect('clients-list')
+    except RestrictedError:
+        messages.error(
+            request,
+            "Nelze smazat klienta, který má uzavřené smlouvy. Ukončete nejprve všechny jeho smlouvy."
+        )
+    return redirect(request.META['HTTP_REFERER'])
+

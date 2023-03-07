@@ -6,8 +6,10 @@
         <tr>
             <th>Příjmení</th>
             <th>Jméno</th>
+            <th>E-mail</th>
             <th>Bydliště</th>
             <th>Datum narození</th>
+            <th>Vymazat</th>
         </tr>
     </thead>
     <tbody>
@@ -17,8 +19,10 @@
         <tr>
             <td><a href="#">{{ obj.last_name }}</a></td>
             <td>{{ obj.first_name }}</td>
+            <td>{{ obj.email }}</td>
             <td>{{ obj.full_address }}</td>
             <td>{{ obj.date_of_birth }}</td>
+            <td><a href="{% url 'client-delete' pk=obj.pk %}"><i class="bi bi-trash link-danger"></i></a></td>
         </tr>
 
     {% endfor %}
