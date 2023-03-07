@@ -1,12 +1,11 @@
 Create static page saying that password and other changes were successful
-Backoffice functionality: create, update, delete users, contracts, products
-    - create user
-    - update user
+Client administration functionality: delete user
+Backoffice functionality: create, update, delete contracts
     - delete user
     - create contract
     - update contract
     - delete contract
-    - create product
-    - update product
-    - delete product (aka. mark as inactive)
 Check if the payment is positive
+Handle user permissions (somehow)
+    - logged in user has access to his contracts
+    - logged in staff has access to administration menu items

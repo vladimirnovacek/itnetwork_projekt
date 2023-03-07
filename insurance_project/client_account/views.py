@@ -1,6 +1,7 @@
-
-from django.contrib.auth import views as auth_views
+from django.contrib import messages
+from django.contrib.auth import views as auth_views, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import RestrictedError
 from django.http import HttpRequest, Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
@@ -156,3 +157,24 @@ class UpdateUserView(generic.UpdateView):
 
 class PasswordChangeView(auth_views.PasswordChangeView):
     template_name = template.FORM
+
+
+def delete_person(request):
+    person = request.user
+    try:
+        person.delete()
+    except RestrictedError:
+        messages.error(
+            request,
+            "Nemůžeme uzavřít Váš účet, dokud u nás máte uzavřenou nějakou smlouvu."
+            " Nejprve ukončete všechny své platné smlouvy."
+        )
+        return redirect(request.META['HTTP_REFERER'])
+    else:
+        auth_logout(request)
+        return redirect('home')
+
+
+def logout(request):
+    auth_logout(request)
+    return redirect('home')

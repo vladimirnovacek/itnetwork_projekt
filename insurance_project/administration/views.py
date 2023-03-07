@@ -1,5 +1,5 @@
 from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import generic
 
@@ -53,8 +53,10 @@ class ProductDeleteView(generic.UpdateView):
         self.object.save()
         return redirect('products-list')
 
+
 class ClientListView(generic.ListView):
     model = models.Person
+    queryset = models.Person.objects.filter(is_staff=False)
     template_name = template.CLIENT_LIST
 
     def get(self, request, *args, **kwargs):
@@ -62,3 +64,10 @@ class ClientListView(generic.ListView):
             raise Http404
         else:
             return super().get(request, *args, **kwargs)
+
+
+def delete_person(request, pk):
+    person = get_object_or_404(models.Person, pk=pk)
+    if not models.Contract.objects.get(insured=person):
+        person.delete()
+    return redirect('clients-list')
