@@ -45,6 +45,9 @@ class ProductUpdateView(generic.UpdateView):
         self.object = self.get_object()
         return self.render_to_response(self.get_context_data(title=self.object.name))
 
+    def get_success_url(self):
+        return reverse('products-list')
+
 
 class ProductDeleteView(generic.UpdateView):
     model = models.Product
@@ -68,6 +71,17 @@ class ClientListView(generic.ListView):
         else:
             request.title = self.title
             return super().get(request, *args, **kwargs)
+
+
+class ContractsList(generic.ListView):
+    model = models.Contract
+    template_name = template.ADMIN_CONTRACTS_LIST
+
+    def get(self, request, *args, **kwargs):
+        self.person = models.Person.objects.get(pk=kwargs['pk'])
+        title = f'Smlouvy klienta {self.person}'
+        self.queryset = self.get_queryset().filter(insured=self.person)
+        return render(request, self.template_name, {'objects_list': self.queryset, 'title': title})
 
 
 def delete_person(request, pk):

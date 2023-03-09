@@ -1,8 +1,7 @@
 Create messages saying that password and other changes were successful
-Backoffice functionality:
-    - delete user
-    - list contracts
+Add titles to all requests
 Check if the payment is positive
 Handle user permissions (somehow)
     - logged in user has access to his contracts
     - logged in staff has access to administration menu items
+Add staff functionality

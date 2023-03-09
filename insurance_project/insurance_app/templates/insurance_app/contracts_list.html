@@ -1,8 +1,8 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    {% if object_list.0 %}
-    {% for obj in object_list %}
+    {% if objects_list.0 %}
+    {% for obj in objects_list %}
     <a href="{% url 'contract-detail' contract_number=obj.contract_number %}" class="text-decoration-none link-dark">
         <section class="bg-secondary hover-overlay border border-2 rounded-2 p-3 m-3" data-mdb-ripple-color="light">
             <h1>{{ obj.product.name }}</h1>
