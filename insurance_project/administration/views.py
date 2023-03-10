@@ -39,7 +39,7 @@ class ProductCreateView(generic.CreateView):
 class ProductUpdateView(generic.UpdateView):
     form_class = forms.ProductUpdateForm
     model = models.Product
-    template_name = template.FORM
+    template_name = template.PRODUCT_UPDATE_FORM
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()

@@ -7,11 +7,12 @@ class ProductCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Product
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'image']
 
 
 class ProductUpdateForm(forms.ModelForm):
+    image = forms.ImageField()
 
     class Meta:
         model = models.Product
-        fields = ['description']
+        fields = ['description', 'image']

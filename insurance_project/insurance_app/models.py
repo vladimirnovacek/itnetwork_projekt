@@ -99,6 +99,7 @@ class Product(models.Model):
     name = models.CharField(max_length=64, unique=True)
     description = models.TextField(default="")
     active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='images/')
 
     def __str__(self):
         inactive = " (nedostupné)" if not self.active else ""

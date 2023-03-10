@@ -4,8 +4,17 @@
 
 {% for product in active %}
     <section>
-        <h3>{{ product.name }}</h3>
-        <p>{{ product.description }}</p>
+        <div class="container">
+            <div class="row bg-light mb-3">
+                <div class="col {% cycle 'order-1' 'order-2' %} d-flex flex-column justify-content-evenly align-items-center">
+                    <h3>{{ product.name }}</h3>
+                    <p class="text-center">{{ product.description }}</p>
+                </div>
+                <div class="col {% cycle 'order-2' 'order-1' %}">
+                    <img src="{{ product.image.url }}" class="rounded" style="max-height: 300px;">
+                </div>
+            </div>
+        </div>
     </section>
 {% empty %}
     <section>

@@ -5,3 +5,4 @@ Handle user permissions (somehow)
     - logged in user has access to his contracts
     - logged in staff has access to administration menu items
 Add staff functionality
+Write comments to everything
