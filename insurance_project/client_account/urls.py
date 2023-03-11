@@ -1,4 +1,6 @@
-
+"""
+Url patterns for the client_account app.
+"""
 from django.urls import path
 
 from . import views

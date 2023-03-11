@@ -1,26 +1,37 @@
+"""
+Module containing form classes of the client_account app
+"""
 from django import forms
+from django.db.models import Model
 
 from insurance_app import models
 
 
 class RegisterContractForm(forms.ModelForm):
-    model = models.Contract
-    product = forms.ModelChoiceField(queryset=models.Product.objects.filter(active=True))
+    """
+    Form for creating new contracts
+    """
+    model: Model = models.Contract
+    product: forms.Field = forms.ModelChoiceField(queryset=models.Product.objects.filter(active=True))
 
     class Meta:
         model = models.Contract
-        fields = ["product", "payment"]
+        fields: list[str] = ["product", "payment"]
 
 
 class UpdateContractForm(forms.ModelForm):
-
+    """
+    Form for updating contract details
+    """
     class Meta:
-        model = models.Contract
-        fields = ["payment"]
+        model: Model = models.Contract
+        fields: list[str] = ["payment"]
 
 
 class UpdateUserForm(forms.ModelForm):
-
+    """
+    Form for updating client's personal informations
+    """
     class Meta:
-        model = models.Person
-        fields = ["phone", "address1", "address2", "postal_code", "city", "country"]
+        model: Model = models.Person
+        fields: list[str] = ["phone", "address1", "address2", "postal_code", "city", "country"]

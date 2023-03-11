@@ -1,11 +1,14 @@
+"""
+Views for the administration app.
+"""
 from django.contrib import messages
 from django.contrib.auth import views as auth_views, logout as auth_logout
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-from django.db.models import RestrictedError
-from django.http import HttpRequest
+from django.db.models import RestrictedError, Model, QuerySet
+from django.forms import Form
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views import generic
 
 from client_account import forms
@@ -13,35 +16,64 @@ from insurance_app import models
 from insurance_project import template_names as template
 
 
-class ContractsListView(LoginRequiredMixin, generic.ListView):
-    # TODO odstranit LoginRequiredMixin, asi neni potřeba. Asi...
-    model = models.Contract
-    template_name = template.CONTRACTS
-    title = "Moje smlouvy"
+class ContractsListView(generic.ListView):
+    """
+    View for displaying client's contracts
+    """
+    model: Model = models.Contract
+    template_name: str = template.CONTRACTS
+    title: str = "Moje smlouvy"
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param QuerySet object_list:
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(object_list=object_list, **kwargs)
         context['title'] = self.title
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Filter default queryset by logged in client
+        :return QuerySet:
+        """
         queryset = super().get_queryset()
         queryset = queryset.filter(insured=self.request.user)
         return queryset
 
 
 class RegisterContractView(generic.CreateView):
-    form_class = forms.RegisterContractForm
-    template_name = template.FORM
-    title = 'Uzavřít smlouvu'
+    """
+    View for creating new contract to the client
+    """
+    form_class: Form = forms.RegisterContractForm
+    template_name: str = template.FORM
+    title: str = 'Uzavřít smlouvu'
     success_url = reverse_lazy("my-contracts")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         return context
 
-    def post(self, request: HttpRequest, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle POST requests
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         form = self.form_class(request.POST)
         if hasattr(request, "user"):
             contract = form.save(commit=False)
@@ -56,29 +88,53 @@ class RegisterContractView(generic.CreateView):
 
 
 class ContractDetailView(generic.DetailView):
-    model = models.Contract
-    template_name = template.CONTRACT_DETAIL
+    """
+    View for displaying details of a given contract
+    """
+    model: models.Contract = models.Contract
+    template_name: str = template.CONTRACT_DETAIL
     # title = None  # Title is the name of the contract
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.product.name
         return context
 
-    def post(self, request: HttpRequest, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle POST requests
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         contract_number = kwargs.get('contract_number')
         if "edit" in request.POST:
             return redirect("contract-update", contract_number)
         if "delete" in request.POST:
-            self.__delete_object()
+            self._delete_object()
             return redirect("my-contracts")
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
+    def get_queryset(self) -> QuerySet:
+        """
+        The contract is identified by a contract number in the URL, not by pk. This method determines the pk and adds it
+        to the self.kwargs attribute and returns a default queryset.
+        :return QuerySet:
+        """
         self.kwargs['pk'] = self.model.get_pk_by_contract_number(self.kwargs.get('contract_number'))
-        return queryset
+        return super().get_queryset()
 
-    def __delete_object(self):
+    def _delete_object(self) -> None:
+        """
+        Delete a contract.
+        :return None:
+        """
         if not self.object:
             messages.warning(self.request, 'Smlouvu se nepodařilo zrušit')
             return
@@ -87,52 +143,93 @@ class ContractDetailView(generic.DetailView):
 
 
 class UpdateContractView(generic.UpdateView):
-    form_class = forms.UpdateContractForm
-    template_name = template.FORM
-    model = models.Contract
-    title = 'Upravit {} číslo {}'
+    """
+    View for updating a contract
+    """
+    form_class: Form = forms.UpdateContractForm
+    template_name: str = template.FORM
+    model: models.Contract = models.Contract
+    title: str = 'Upravit {} číslo {}'
+    success_url = reverse_lazy('my-contracts')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title.format(self.object.product.name, self.object.contract_number)
         return context
 
-    def get_success_url(self):
-        return reverse("my-contracts")
-
-    def form_valid(self, form):
+    def form_valid(self, form: Form) -> HttpResponse:
+        """
+        Save the associated model and add a success message
+        :param Form form: form to be validated
+        :return HttpResponse:
+        """
         response = super().form_valid(form)
         messages.success(self.request, 'Detaily smlouvy byly upraveny')
         return response
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        The contract is identified by a contract number in the URL, not by pk. This method determines the pk and adds it
+        to the self.kwargs attribute and returns the default queryset.
+        :return QuerySet:
+        """
         queryset = super().get_queryset()
         self.kwargs['pk'] = self.model.get_pk_by_contract_number(self.kwargs.get('contract_number'))
         return queryset
 
 
 class LoginView(auth_views.LoginView):
+    """
+    The default django login view is used, this class only sets a page where the client is redirected after login
+    """
     next_page = "my-contracts"
 
 
 class UpdateUserView(generic.UpdateView):
-    form_class = forms.UpdateUserForm
-    template_name = template.FORM
-    model = form_class.Meta.model
-    title = 'Nastavení osobních údajů'
+    """
+    View for updating client personal informations
+    """
+    form_class: forms.UpdateUserForm = forms.UpdateUserForm
+    template_name: str = template.FORM
+    model: Model = form_class.Meta.model
+    title: str = 'Nastavení osobních údajů'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         return context
 
-    def get_object(self, queryset=None):
+    def get_object(self, queryset: QuerySet | None = None) -> Model:
+        """
+        Get a Person object of a loged in client
+        :param QuerySet queryset:
+        :return Model:
+        """
         if queryset is None:
             queryset = self.get_queryset()
         queryset = queryset.filter(pk=self.request.user.pk)
         return queryset.get()
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle POST requests
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         form = self.form_class(request.POST, instance=self.get_object())
         if form.is_valid():
             form.save()
@@ -141,32 +238,54 @@ class UpdateUserView(generic.UpdateView):
 
 
 class PasswordChangeView(auth_views.PasswordChangeView):
-    template_name = template.FORM
+    """
+    View for a password change
+    """
+    template_name: str = template.FORM
     success_url = reverse_lazy('my-contracts')
 
-    def form_valid(self, form):
+    def form_valid(self, form: Form) -> HttpResponse:
+        """
+        Adds a message about successfully changing the password
+        :param Form form:
+        :return HttpResponse:
+        """
         response = super().form_valid(form)
         messages.success(self.request, 'Heslo bylo úspěšně změněno')
         return response
 
 
-def delete_person(request):
+def delete_person(request: HttpRequest) -> HttpResponse:
+    """
+    View function for deleting a client's account
+    :param HttpRequest request:
+    :return HttpResponse:
+    """
     person = request.user
     try:
         person.delete()
     except RestrictedError:
         messages.error(
             request,
-            "Nemůžeme uzavřít Váš účet, dokud u nás máte uzavřenou nějakou smlouvu."
-            " Nejprve ukončete všechny své platné smlouvy."
+            "Nemůžeme uzavřít Váš účet, dokud u nás máte uzavřenou nějakou smlouvu. "
+            "Nejprve ukončete všechny své platné smlouvy."
         )
         return redirect(request.META['HTTP_REFERER'])
     else:
         auth_logout(request)
+        messages.success(
+            request,
+            'Váš účet byl odstraněn. Pokud se někdy rozhodnete k nám vrátit, bude potřeba se zaregistrovat znovu.'
+        )
         return redirect('home')
 
 
-def logout(request):
+def logout(request: HttpRequest) -> HttpResponse:
+    """
+    View function for logging client out
+    :param HttpRequest request:
+    :return HttpResonse:
+    """
     auth_logout(request)
     messages.info(request, 'Byli jste odhlášeni')
     return redirect('home')

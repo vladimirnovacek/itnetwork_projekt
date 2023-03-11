@@ -16,7 +16,7 @@ from insurance_project import template_names as template
 
 class ProductsListView(generic.ListView):
     """
-    View displaying products.
+    View displaying products list.
     """
     model: Model = models.Product
     template_name: str = template.PRODUCTS_LIST
@@ -53,7 +53,7 @@ class ProductCreateView(generic.CreateView):
     def get_context_data(self, **kwargs) -> dict:
         """
         Get the context for this view.
-        Extends the parent method with additional context of th page title.
+        Extends the parent method with additional context of the page title.
         :param dict kwargs: additional keyword arguments
         :return dict: context data
         """
@@ -130,12 +130,12 @@ class ProductDeleteView(generic.UpdateView):
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """
-                Handle POST requests
-                :param HttpRequest request:
-                :param list args:
-                :param dict kwargs:
-                :return HttpResponse:
-                """
+        Handle POST requests
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         if self.get_form().is_valid():
             messages.success(request, 'Produkt byl úspěšně odstraněn')
         return super().post(request, *args, **kwargs)
