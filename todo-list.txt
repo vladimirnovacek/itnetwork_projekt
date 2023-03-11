@@ -1,5 +1,3 @@
-Create messages saying that password and other changes were successful
-Add titles to all requests
 Check if the payment is positive
 Handle user permissions (somehow)
     - logged in user has access to his contracts
@@ -12,3 +10,4 @@ Paginate the list of clients in the administration interface
 Stop using single and double quotes willy-nilly
 Adjust form labels
 ProductDeleteView could be a function
+Add type hints
