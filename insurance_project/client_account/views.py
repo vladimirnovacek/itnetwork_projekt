@@ -168,5 +168,5 @@ def delete_person(request):
 
 def logout(request):
     auth_logout(request)
-    messages.info('Byli jste odhlášeni')
+    messages.info(request, 'Byli jste odhlášeni')
     return redirect('home')
