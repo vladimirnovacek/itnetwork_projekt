@@ -9,5 +9,5 @@ Paginate the list of clients in the administration interface
     - add a search bar
 Stop using single and double quotes willy-nilly
 Adjust form labels
-ProductDeleteView could be a function
+ProductDeleteView should be a function
 Add type hints

@@ -1,7 +1,12 @@
+"""
+Views for the administration app.
+"""
 from django.contrib import messages
-from django.db.models import RestrictedError
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
+from django.db.models import RestrictedError, QuerySet, Model
+from django.forms import Form
+from django.http import HttpResponse, HttpRequest
+from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import generic
 
 from administration import forms
@@ -10,11 +15,21 @@ from insurance_project import template_names as template
 
 
 class ProductsListView(generic.ListView):
-    model = models.Product
-    template_name = template.PRODUCTS_LIST
-    title = 'Seznam produktů'
+    """
+    View displaying products.
+    """
+    model: Model = models.Product
+    template_name: str = template.PRODUCTS_LIST
+    title: str = 'Seznam produktů'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet | None = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent's method with additional context of active and inactive products and the page title.
+        :param QuerySet object_list: set of passed on objects
+        :param dict kwargs: additional keyword arguments
+        :return dict: context data
+        """
         context = super().get_context_data(object_list=object_list, **kwargs)
         queryset = object_list if object_list else self.object_list
         active = queryset.filter(active=True)
@@ -26,90 +41,166 @@ class ProductsListView(generic.ListView):
 
 
 class ProductCreateView(generic.CreateView):
-    form_class = forms.ProductCreateForm
-    model = models.Product
-    template_name = template.PRODUCT_FORM
-    title = 'Nový produkt'
+    """
+    View for creating new products
+    """
+    form_class: Form = forms.ProductCreateForm
+    model: Model = models.Product
+    template_name: str = template.PRODUCT_FORM
+    title: str = 'Nový produkt'
+    success_url = reverse_lazy('products-list')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of th page title.
+        :param dict kwargs: additional keyword arguments
+        :return dict: context data
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle POST requests.
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         if self.get_form().is_valid():
             messages.success(request, 'Produkt byl úspěšně vytvořen')
         return super().post(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return reverse('products-list')
-
 
 class ProductUpdateView(generic.UpdateView):
-    form_class = forms.ProductUpdateForm
-    model = models.Product
-    template_name = template.PRODUCT_FORM
+    """
+    View for changing products
+    """
+    form_class: Form = forms.ProductUpdateForm
+    model: Model = models.Product
+    template_name: str = template.PRODUCT_FORM
     # title = None  # title is the name of the product to be updated
+    success_url = reverse_lazy('products-list')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param dict kwargs: additional keyword arguments
+        :return dict: context data
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.name
+        print(type(reverse_lazy('products-list')))
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle POST requests
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         if self.get_form().is_valid():
             messages.success(request, 'Produkt byl úspěšně upraven')
         return super().post(request, *args, **kwargs)
 
-    def get_success_url(self):
-        return reverse('products-list')
-
 
 class ProductDeleteView(generic.UpdateView):
+    """
+    View for marking a product as inactive
+    """
     model = models.Product
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle GET requests
+        :param HttpRequest request:
+        :param list args:
+        :param dict kwargs:
+        :return HttpResponse:
+        """
         obj = self.get_object()
         obj.active = False
         obj.save()
         return redirect('products-list')
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+                Handle POST requests
+                :param HttpRequest request:
+                :param list args:
+                :param dict kwargs:
+                :return HttpResponse:
+                """
         if self.get_form().is_valid():
             messages.success(request, 'Produkt byl úspěšně odstraněn')
         return super().post(request, *args, **kwargs)
 
 
 class ClientListView(generic.ListView):
-    model = models.Person
-    queryset = models.Person.objects.filter(is_staff=False)
-    template_name = template.CLIENT_LIST
-    title = "Seznam klientů"
+    """
+    View for displaying list of clients
+    """
+    model: Model = models.Person
+    queryset: QuerySet = models.Person.objects.filter(is_staff=False)
+    template_name: str = template.CLIENT_LIST
+    title: str = "Seznam klientů"
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param QuerySet object_list:
+        :param dict kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         return context
 
 
 class ContractsListView(generic.ListView):
-    model = models.Contract
-    template_name = template.ADMIN_CONTRACTS_LIST
-    title = 'Smlouvy klienta {}'
+    """
+    View for displaying contracts of a client given by primary key in the URL
+    """
+    model: Model = models.Contract
+    template_name: str = template.ADMIN_CONTRACTS_LIST
+    title: str = 'Smlouvy klienta {}'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param QuerySet object_list:
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title.format(models.Person.objects.get(pk=self.kwargs['pk']))
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Filter default queryset by client's primary key
+        :return QuerySet:
+        """
         queryset = super().get_queryset()
         person = models.Person.objects.get(pk=self.kwargs['pk'])
         queryset = queryset.filter(insured=person)
         return queryset
 
 
-def delete_person(request, pk):
+def delete_person(request: HttpRequest, pk: int) -> HttpResponse:
+    """
+    View function for deleting a client account
+    :param HttpRequest request:
+    :param int pk: client's primary key
+    :return HttpResponse:
+    """
     person = get_object_or_404(models.Person, pk=pk)
     try:
         person.delete()

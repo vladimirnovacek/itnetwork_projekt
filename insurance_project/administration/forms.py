@@ -1,9 +1,16 @@
+"""
+Module containing form classes of the administration app
+"""
+
 from django import forms
 
 from insurance_app import models
 
 
 class ProductCreateForm(forms.ModelForm):
+    """
+    Form for creating new insurance product.
+    """
 
     class Meta:
         model = models.Product
@@ -11,7 +18,9 @@ class ProductCreateForm(forms.ModelForm):
 
 
 class ProductUpdateForm(forms.ModelForm):
-    image = forms.ImageField()
+    """
+    Form for updating an insurance product.
+    """
 
     class Meta:
         model = models.Product
