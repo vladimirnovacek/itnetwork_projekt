@@ -1,9 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import views as auth_views, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 from django.db.models import RestrictedError
-from django.http import HttpRequest, Http404
-from django.shortcuts import render, redirect
+from django.http import HttpRequest
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 
@@ -13,19 +14,32 @@ from insurance_project import template_names as template
 
 
 class ContractsListView(LoginRequiredMixin, generic.ListView):
+    # TODO odstranit LoginRequiredMixin, asi neni potřeba. Asi...
     model = models.Contract
     template_name = template.CONTRACTS
+    title = "Moje smlouvy"
 
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        object_list = self.model.objects.filter(insured=user)
-        return render(request, self.template_name, {"object_list": object_list})
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['title'] = self.title
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(insured=self.request.user)
+        return queryset
 
 
 class RegisterContractView(generic.CreateView):
     form_class = forms.RegisterContractForm
     template_name = template.FORM
+    title = 'Uzavřít smlouvu'
     success_url = reverse_lazy("my-contracts")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title
+        return context
 
     def post(self, request: HttpRequest, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -34,63 +48,41 @@ class RegisterContractView(generic.CreateView):
             contract.insured = request.user
             contract.save()
         if form.is_valid():
+            messages.success(request, 'Vaše smlouva byla úspěšně sjednána. Děkujeme Vám za Vaši důvěru')
             return self.form_valid(form)
         else:
+            messages.warning(request, 'Formulář není vyplněný správně')
             return self.form_invalid(form)
 
 
 class ContractDetailView(generic.DetailView):
     model = models.Contract
     template_name = template.CONTRACT_DETAIL
+    # title = None  # Title is the name of the contract
 
-    def get(self, request: HttpRequest, *args, **kwargs):
-        self.object = self.get_object()
-        return render(request, self.template_name, {"obj": self.object})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.object.product.name
+        return context
 
     def post(self, request: HttpRequest, *args, **kwargs):
-        self.object = self.get_object()
-        contract_number = kwargs.get('contract_number', self.object.contract_number)
+        contract_number = kwargs.get('contract_number')
         if "edit" in request.POST:
             return redirect("contract-update", contract_number)
         if "delete" in request.POST:
             self.__delete_object()
             return redirect("my-contracts")
 
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
-
-        contract_number = self.kwargs.get("contract_number")
-        pk = self.model.get_pk_by_contract_number(contract_number)
-        slug = self.kwargs.get(self.slug_url_kwarg)
-        if pk is not None:
-            queryset = queryset.filter(pk=pk)
-
-        # Next, try looking up by slug.
-        if slug is not None and (pk is None or self.query_pk_and_slug):
-            slug_field = self.get_slug_field()
-            queryset = queryset.filter(**{slug_field: slug})
-
-        # If none of those are defined, it's an error.
-        if pk is None and slug is None:
-            raise AttributeError(
-                "Generic detail view %s must be called with either an object "
-                "pk or a slug in the URLconf." % self.__class__.__name__
-            )
-
-        try:
-            # Get the single item from the filtered queryset
-            obj = queryset.get()
-        except queryset.model.DoesNotExist:
-            raise Http404(
-                "No %(verbose_name)s found matching the query"
-                % {"verbose_name": queryset.model._meta.verbose_name}
-            )
-        return obj
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.kwargs['pk'] = self.model.get_pk_by_contract_number(self.kwargs.get('contract_number'))
+        return queryset
 
     def __delete_object(self):
         if not self.object:
+            messages.warning(self.request, 'Smlouvu se nepodařilo zrušit')
             return
+        messages.success(self.request, 'Smlouva byla úspěšně zrušena')
         self.object.delete()
 
 
@@ -98,41 +90,25 @@ class UpdateContractView(generic.UpdateView):
     form_class = forms.UpdateContractForm
     template_name = template.FORM
     model = models.Contract
+    title = 'Upravit {} číslo {}'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title.format(self.object.product.name, self.object.contract_number)
+        return context
 
     def get_success_url(self):
         return reverse("my-contracts")
 
-    def get_object(self, queryset=None):
-        if queryset is None:
-            queryset = self.get_queryset()
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Detaily smlouvy byly upraveny')
+        return response
 
-        contract_number = self.kwargs.get("contract_number")
-        pk = self.model.get_pk_by_contract_number(contract_number)
-        slug = self.kwargs.get(self.slug_url_kwarg)
-        if pk is not None:
-            queryset = queryset.filter(pk=pk)
-
-        # Next, try looking up by slug.
-        if slug is not None and (pk is None or self.query_pk_and_slug):
-            slug_field = self.get_slug_field()
-            queryset = queryset.filter(**{slug_field: slug})
-
-        # If none of those are defined, it's an error.
-        if pk is None and slug is None:
-            raise AttributeError(
-                "Generic detail view %s must be called with either an object "
-                "pk or a slug in the URLconf." % self.__class__.__name__
-            )
-
-        try:
-            # Get the single item from the filtered queryset
-            obj = queryset.get()
-        except queryset.model.DoesNotExist:
-            raise Http404(
-                "No %(verbose_name)s found matching the query"
-                % {"verbose_name": queryset.model._meta.verbose_name}
-            )
-        return obj
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.kwargs['pk'] = self.model.get_pk_by_contract_number(self.kwargs.get('contract_number'))
+        return queryset
 
 
 class LoginView(auth_views.LoginView):
@@ -143,20 +119,35 @@ class UpdateUserView(generic.UpdateView):
     form_class = forms.UpdateUserForm
     template_name = template.FORM
     model = form_class.Meta.model
+    title = 'Nastavení osobních údajů'
 
-    def get(self, request: HttpRequest, *args, **kwargs):
-        form = self.form_class(instance=self.model.objects.get(pk=request.user.pk))
-        return render(request, self.template_name, {"form": form})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title
+        return context
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        queryset = queryset.filter(pk=self.request.user.pk)
+        return queryset.get()
 
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, instance=self.model.objects.get(pk=request.user.pk))
+        form = self.form_class(request.POST, instance=self.get_object())
         if form.is_valid():
             form.save()
+            messages.success(request, 'Vaše údaje byly úspěšně změněny')
             return redirect("my-contracts")
 
 
 class PasswordChangeView(auth_views.PasswordChangeView):
     template_name = template.FORM
+    success_url = reverse_lazy('my-contracts')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Heslo bylo úspěšně změněno')
+        return response
 
 
 def delete_person(request):
@@ -177,4 +168,5 @@ def delete_person(request):
 
 def logout(request):
     auth_logout(request)
+    messages.info('Byli jste odhlášeni')
     return redirect('home')
