@@ -5,7 +5,7 @@
 {% for product in active %}
     <section>
         <div class="container">
-            <div class="row bg-light mb-3">
+            <div class="row d-block d-md-flex bg-light mb-3">
                 <div class="col col-sm-6 {% cycle 'order-1' 'order-2' %} d-flex flex-column justify-content-evenly align-items-center">
                     <h3>{{ product.name }}</h3>
                     <p class="text-center">{{ product.description }}</p>
