@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 
 from django.http import HttpRequest
 from django.shortcuts import render, redirect
@@ -22,6 +22,7 @@ class IndexView(generic.ListView):
 
 
 class RegisterUserView(generic.CreateView):
+    model = get_user_model()
     form_class = forms.RegisterPersonForm
     template_name = template.FORM
     title = 'Registrace'
