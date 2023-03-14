@@ -25,7 +25,7 @@ class RegisterUserView(generic.CreateView):
     form_class = forms.RegisterPersonForm
     template_name = template.FORM
     title = 'Registrace'
-    success_url = reverse_lazy('regiter-contract')
+    success_url = reverse_lazy('register-contract')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
