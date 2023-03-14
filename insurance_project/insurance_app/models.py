@@ -1,3 +1,6 @@
+"""
+Module containing models for this app
+"""
 import unicodedata
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -9,24 +12,45 @@ from phonenumber_field import modelfields
 
 
 class PersonManager(BaseUserManager):
-    def _create_user(self, email, password, **extra_fields):
+    """
+    Manager for the class Person. Default manager can't be used for Person model authenticates via e-mail.
+    """
+    def _create_user(self, email: str, password: str, **extra_fields) -> AbstractBaseUser:
         """
-        Create and save a user with the given username, email, and password.
+        Create and save a user with the given email, and password.
+        :param str email:
+        :param str password:
+        :param extra_fields:
+        :return AbstractBaseUser:
         """
         if not email:
-            raise ValueError("The given e-mail must be set")
+            raise ValueError("E-mail musí být zadán.")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.password = make_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email=None, password=None, **extra_fields):
+    def create_user(self, email: str = None, password: str = None, **extra_fields) -> AbstractBaseUser:
+        """
+        Create and save a user with the given email, and password.
+        :param str email:
+        :param str password:
+        :param extra_fields:
+        :return AbstractBaseUser:
+        """
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, email=None, password=None, **extra_fields):
+    def create_superuser(self, email: str = None, password: str = None, **extra_fields) -> AbstractBaseUser:
+        """
+        Create and save a superuser with the given email, and password.
+        :param str email:
+        :param str password:
+        :param extra_fields:
+        :return AbstractBaseUser:
+        """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -39,7 +63,9 @@ class PersonManager(BaseUserManager):
 
 
 class Person(AbstractBaseUser, PermissionsMixin):
-
+    """
+    This model represents the users, both regular and admins.
+    """
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "date_of_birth"]
 
@@ -61,13 +87,8 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     @property
     def full_address(self):
-        return ", ".join((
-            str(self.address1),
-            str(self.address2),
-            str(self.city),
-            str(self.postal_code),
-            str(self.country)
-        ))
+        chunks = tuple(filter(lambda c: c, (self.address1, self.address2, self.city, self.postal_code, self.country)))
+        return ", ".join(chunks)
 
     def has_perm(self, perm, obj=None):
         return True

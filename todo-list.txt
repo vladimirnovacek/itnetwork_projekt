@@ -11,3 +11,4 @@ Stop using single and double quotes willy-nilly
 Adjust form labels
 ProductDeleteView should be a function
 Add type hints
+Add possibility for admin to add staff
