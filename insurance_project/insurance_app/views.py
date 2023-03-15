@@ -34,13 +34,15 @@ class RegisterUserView(generic.CreateView):
         return context
 
     def post(self, request: HttpRequest, *args, **kwargs):
-        form = self.form_class(request.POST)
+        # form = self.form_class(request.POST)
+        form = self.get_form()
         if form.is_valid():
-            new_user = form.save()
-            login(request, new_user)
+            self.object = form.save()
             messages.success(
                 request,
                 'Váš účet byl úspěšně vytvořen. Nyní si můžete uzavřít svou první smlouvu u naší společnosti'
             )
+            login(request, self.object)
             return redirect(self.get_success_url())
-        return render(request, self.template_name, {"form": form, 'title': self.title})
+        else:
+            return render(request, self.template_name, {"form": form, 'title': self.title})

@@ -118,6 +118,8 @@ class ContractDetailView(generic.DetailView):
         if "edit" in request.POST:
             return redirect("contract-update", contract_number)
         if "delete" in request.POST:
+            if not hasattr(self, 'object'):
+                self.object = self.get_object()
             self._delete_object()
             return redirect("my-contracts")
 
@@ -135,7 +137,7 @@ class ContractDetailView(generic.DetailView):
         Delete a contract.
         :return None:
         """
-        if not self.object:
+        if not hasattr(self, 'object'):
             messages.warning(self.request, 'Smlouvu se nepodařilo zrušit')
             return
         messages.success(self.request, 'Smlouva byla úspěšně zrušena')
