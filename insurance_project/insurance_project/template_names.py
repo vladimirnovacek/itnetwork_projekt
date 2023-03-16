@@ -1,4 +1,6 @@
-
+"""
+Module with literal constants with names of the HTML templates
+"""
 HOME = "insurance_app/home.html"
 FORM = "insurance_app/dummy_form_template.html"
 CONTRACTS = "insurance_app/my_contracts.html"

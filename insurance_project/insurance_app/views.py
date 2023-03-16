@@ -1,7 +1,12 @@
-from django.contrib import messages
+"""
+Views for the insurance_app
+"""
+from django.contrib import messages, auth
 from django.contrib.auth import login, get_user_model
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.forms import Form
 
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -11,10 +16,20 @@ from insurance_project import template_names as template
 
 
 class IndexView(generic.ListView):
-    model = models.Product
-    template_name = template.HOME
+    """
+    View for the index page
+    """
+    model:models.Product = models.Product
+    template_name: str = template.HOME
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Processes the GET requests
+        :param HttpRequest request:
+        :param args:
+        :param kwargs:
+        :return HttpResponse:
+        """
         object_list = self.get_queryset()
         active = object_list.filter(active=True)
         inactive = object_list.filter(active=False)
@@ -22,19 +37,33 @@ class IndexView(generic.ListView):
 
 
 class RegisterUserView(generic.CreateView):
-    model = get_user_model()
-    form_class = forms.RegisterPersonForm
-    template_name = template.FORM
-    title = 'Registrace'
+    """
+    View displaying the client registration form
+    """
+    model: AbstractBaseUser = get_user_model()
+    form_class: Form = forms.RegisterPersonForm
+    template_name: str = template.FORM
+    title: str = 'Registrace'
     success_url = reverse_lazy('register-contract')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Returns the default context data with additional 'title' variable
+        :param kwargs:
+        :return dict:
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         return context
 
-    def post(self, request: HttpRequest, *args, **kwargs):
-        # form = self.form_class(request.POST)
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Handle POST requests. If form is valid, creates the new user and logs them in.
+        :param HttpRequest request:
+        :param args:
+        :param kwargs:
+        :return HttpResponse:
+        """
         form = self.get_form()
         if form.is_valid():
             self.object = form.save()

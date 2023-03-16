@@ -1,4 +1,6 @@
-
+"""
+Url patterns for the insurance_app.
+"""
 from django.urls import include, path
 
 from . import views

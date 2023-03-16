@@ -1,5 +1,5 @@
 """
-Views for the administration app.
+Views for the client_account app.
 """
 from django.contrib import messages
 from django.contrib.auth import views as auth_views, logout as auth_logout

@@ -2,6 +2,7 @@
 Module containing models for this app
 """
 import unicodedata
+from typing import Any
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
@@ -66,90 +67,120 @@ class Person(AbstractBaseUser, PermissionsMixin):
     """
     This model represents the users, both regular and admins.
     """
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name", "date_of_birth"]
+    USERNAME_FIELD: str = "email"
+    REQUIRED_FIELDS: list = ["first_name", "last_name", "date_of_birth"]  # other fields are not required for staff
 
-    objects = PersonManager()
+    objects: BaseUserManager = PersonManager()
 
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.EmailField(unique=True)
-    phone = modelfields.PhoneNumberField(region="CZ", null=True)
-    address1 = models.CharField(max_length=150, default="")
-    address2 = models.CharField(max_length=150, blank=True, default="")
-    postal_code = models.CharField(max_length=12, default="")
-    city = models.CharField(max_length=150, default="")
-    country = models.CharField(max_length=150, default="")
-    date_of_birth = models.DateField()
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
-    slug = models.SlugField(unique=True, null=False)
+    first_name: models.Field = models.CharField(max_length=150)
+    last_name: models.Field = models.CharField(max_length=150)
+    email: models.Field = models.EmailField(unique=True)
+    phone: models.Field = modelfields.PhoneNumberField(region="CZ", null=True)
+    address1: models.Field = models.CharField(max_length=150, default="")
+    address2: models.Field = models.CharField(max_length=150, blank=True, default="")
+    postal_code: models.Field = models.CharField(max_length=12, default="")
+    city: models.Field = models.CharField(max_length=150, default="")
+    country: models.Field = models.CharField(max_length=150, default="")
+    date_of_birth: models.Field = models.DateField()
+    is_staff: models.Field = models.BooleanField(default=False)
+    is_superuser: models.Field = models.BooleanField(default=False)
+    slug: models.Field = models.SlugField(unique=True, null=False)
 
     @property
-    def full_address(self):
-        chunks = tuple(filter(lambda c: c, (self.address1, self.address2, self.city, self.postal_code, self.country)))
+    def full_address(self) -> str:
+        chunks = tuple(
+            filter(
+                lambda c: c,
+                (
+                    str(self.address1),
+                    str(self.address2),
+                    str(self.city),
+                    str(self.postal_code),
+                    str(self.country)
+                )
+            )
+        )
+        # chunks = [
+        #     c for c in (
+        #         str(self.address1), str(self.address2), str(self.city), str(self.postal_code), str(self.country)
+        #     ) if c]
         return ", ".join(chunks)
 
-    def has_perm(self, perm, obj=None):
+    def has_perm(self, perm, obj=None) -> bool:
         return True
 
-    def has_module_perms(self, app_label):
+    def has_module_perms(self, app_label) -> bool:
         return True
 
     def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+        self, force_insert: bool = False, force_update: bool = False, using: Any = None, update_fields: Any = None
     ):
         super().save(force_insert, force_update, using, update_fields)
         if not self.slug:
             self.slug = self._generate_slug()
         super().save(force_insert, force_update, using, update_fields)
 
-    def _generate_slug(self):
+    def _generate_slug(self) -> str:
+        """
+        Returns an object slug
+        :return:
+        """
         last_name = self._remove_interpunction(str(self.last_name)).lower()
         first_name = self._remove_interpunction(str(self.first_name)).lower()
         return f"{self.pk}-{last_name}-{first_name}"
 
-    def _remove_interpunction(self, text: str):
+    def _remove_interpunction(self, text: str) -> str:
+        """
+        Transforms a text to ascii.
+        :param text:
+        :return:
+        """
         return unicodedata.normalize("NFKD", text).encode("ASCII", "ignore").decode('utf-8')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.last_name} {self.first_name}"
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-    description = models.TextField(default="")
-    active = models.BooleanField(default=True, blank=True)
-    image = models.ImageField(upload_to='images/')
+    """
+    Model represents an insurance product. It doesn't represent a particular contract.
+    """
+    name: models.Field = models.CharField(max_length=64, unique=True)
+    description: models.Field = models.TextField(default="")
+    active: models.Field = models.BooleanField(default=True, blank=True)
+    image: models.Field = models.ImageField(upload_to='images/')
 
-    def __str__(self):
+    def __str__(self) -> str:
         inactive = " (nedostupné)" if not self.active else ""
         return str(self.name) + inactive
 
 
 class Contract(models.Model):
+    """
+    Model represents a particular contract
+    """
     objects: models.Manager
-    product = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
-    insured = models.ForeignKey(to=Person, on_delete=models.RESTRICT)
-    conclusion_date = models.DateTimeField(auto_now_add=True)
-    payment = models.IntegerField()
+    product: models.Field = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
+    insured: models.Field = models.ForeignKey(to=Person, on_delete=models.RESTRICT)
+    conclusion_date: models.Field = models.DateTimeField(auto_now_add=True)
+    payment: models.Field = models.IntegerField()
 
     @property
     def contract_number(self) -> int:
         """
-        Simple simulation of a unique contract number with 8 - 10 digits
-        :return:
+        Simple non-random simulation of a unique contract number with 8 - 10 digits. It is based on primary key.
+        :return int:
         """
         return 10_000_001 + self.pk * 127 ** 2
 
     @staticmethod
-    def get_pk_by_contract_number(contract_number):
+    def get_pk_by_contract_number(contract_number: int) -> int:
+        """
+        Returns a primary key of a contract identified by a contract number.
+        :param int contract_number:
+        :return int:
+        """
         return int((contract_number - 10_000_001) / (127 ** 2))
 
     def __str__(self):
         return f"{self.product}, klient: {self.insured}"
-
-
-# class DeletedContract(Contract):
-#     def __str__(self):
-#         return super(DeletedContract, self).__str__() + "(zrušeno)"
