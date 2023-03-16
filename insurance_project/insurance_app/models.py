@@ -8,6 +8,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.core import validators
 
 from phonenumber_field import modelfields
 
@@ -163,7 +164,7 @@ class Contract(models.Model):
     product: models.Field = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
     insured: models.Field = models.ForeignKey(to=Person, on_delete=models.RESTRICT)
     conclusion_date: models.Field = models.DateTimeField(auto_now_add=True)
-    payment: models.Field = models.IntegerField()
+    payment: models.Field = models.PositiveIntegerField()
 
     @property
     def contract_number(self) -> int:
