@@ -8,7 +8,6 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.core import validators
 
 from phonenumber_field import modelfields
 
@@ -73,18 +72,18 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     objects: BaseUserManager = PersonManager()
 
-    first_name: models.Field = models.CharField(max_length=150)
-    last_name: models.Field = models.CharField(max_length=150)
-    email: models.Field = models.EmailField(unique=True)
-    phone: models.Field = modelfields.PhoneNumberField(region="CZ", null=True)
-    address1: models.Field = models.CharField(max_length=150, default="")
-    address2: models.Field = models.CharField(max_length=150, blank=True, default="")
-    postal_code: models.Field = models.CharField(max_length=12, default="")
-    city: models.Field = models.CharField(max_length=150, default="")
-    country: models.Field = models.CharField(max_length=150, default="")
-    date_of_birth: models.Field = models.DateField()
-    is_staff: models.Field = models.BooleanField(default=False)
-    is_superuser: models.Field = models.BooleanField(default=False)
+    first_name: models.Field = models.CharField(max_length=150, verbose_name='Křestní jméno')
+    last_name: models.Field = models.CharField(max_length=150, verbose_name='Příjmení')
+    email: models.Field = models.EmailField(unique=True, verbose_name='E-mail')
+    phone: models.Field = modelfields.PhoneNumberField(region="CZ", null=True, verbose_name='Telefon')
+    address1: models.Field = models.CharField(max_length=150, default="", verbose_name='Adresa')
+    address2: models.Field = models.CharField(max_length=150, blank=True, default="", verbose_name='Adresa - druhý řádek')
+    postal_code: models.Field = models.CharField(max_length=12, default="", verbose_name='PSČ')
+    city: models.Field = models.CharField(max_length=150, default="", verbose_name='Město')
+    country: models.Field = models.CharField(max_length=150, default="", verbose_name='Stát')
+    date_of_birth: models.Field = models.DateField(verbose_name='Datum narození')
+    is_staff: models.Field = models.BooleanField(default=False, verbose_name='Zaměstnanec')
+    is_superuser: models.Field = models.BooleanField(default=False, verbose_name='Administrátor')
     slug: models.Field = models.SlugField(unique=True, null=False)
 
     @property
@@ -101,10 +100,6 @@ class Person(AbstractBaseUser, PermissionsMixin):
                 )
             )
         )
-        # chunks = [
-        #     c for c in (
-        #         str(self.address1), str(self.address2), str(self.city), str(self.postal_code), str(self.country)
-        #     ) if c]
         return ", ".join(chunks)
 
     def has_perm(self, perm, obj=None) -> bool:
@@ -146,14 +141,17 @@ class Product(models.Model):
     """
     Model represents an insurance product. It doesn't represent a particular contract.
     """
-    name: models.Field = models.CharField(max_length=64, unique=True)
-    description: models.Field = models.TextField(default="")
-    active: models.Field = models.BooleanField(default=True, blank=True)
-    image: models.Field = models.ImageField(upload_to='images/')
+    name: models.Field = models.CharField(max_length=64, unique=True, verbose_name='Název')
+    description: models.Field = models.TextField(default="", verbose_name='Popis')
+    active: models.Field = models.BooleanField(default=True, blank=True, verbose_name='Aktivní')
+    image: models.Field = models.ImageField(upload_to='images/', verbose_name='Obrázek')
 
     def __str__(self) -> str:
         inactive = " (nedostupné)" if not self.active else ""
         return str(self.name) + inactive
+
+    class Meta:
+        verbose_name = u'Produkt'
 
 
 class Contract(models.Model):
@@ -161,10 +159,10 @@ class Contract(models.Model):
     Model represents a particular contract
     """
     objects: models.Manager
-    product: models.Field = models.ForeignKey(to=Product, on_delete=models.RESTRICT)
-    insured: models.Field = models.ForeignKey(to=Person, on_delete=models.RESTRICT)
-    conclusion_date: models.Field = models.DateTimeField(auto_now_add=True)
-    payment: models.Field = models.PositiveIntegerField()
+    product: models.Field = models.ForeignKey(to=Product, on_delete=models.RESTRICT, verbose_name='Produkt')
+    insured: models.Field = models.ForeignKey(to=Person, on_delete=models.RESTRICT, verbose_name='Pojištěnec')
+    conclusion_date: models.Field = models.DateTimeField(auto_now_add=True, verbose_name='Datum uzavření')
+    payment: models.Field = models.PositiveIntegerField(verbose_name='Pravidelná platba')
 
     @property
     def contract_number(self) -> int:

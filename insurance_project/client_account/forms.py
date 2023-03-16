@@ -12,7 +12,7 @@ class RegisterContractForm(forms.ModelForm):
     Form for creating new contracts
     """
     model: Model = models.Contract
-    product: forms.Field = forms.ModelChoiceField(queryset=models.Product.objects.filter(active=True))
+    product: forms.Field = forms.ModelChoiceField(queryset=models.Product.objects.filter(active=True), label='Produkt')
 
     class Meta:
         model = models.Contract
