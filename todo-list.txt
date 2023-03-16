@@ -2,12 +2,8 @@ Handle user permissions (somehow)
     - logged in user has access to his contracts
     - logged in staff has access to administration menu items
 Add staff functionality
-Write comments to everything
 Make a page footer
 Paginate the list of clients in the administration interface
     - add a search bar
-Stop using single and double quotes willy-nilly
-Adjust form labels
 ProductDeleteView should be a function
-Add type hints
 Add possibility for admin to add staff
