@@ -7,3 +7,4 @@ Paginate the list of clients in the administration interface
     - add a search bar
 ProductDeleteView should be a function
 Add possibility for admin to add staff
+On admin login redirect to different page
