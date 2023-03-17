@@ -146,8 +146,8 @@ class ClientListView(generic.ListView):
     View for displaying list of clients
     """
     model: Model = models.Person
-    paginate_by = 1
-    queryset: QuerySet = models.Person.objects.filter(is_staff=False)
+    paginate_by = 10
+    queryset: QuerySet = models.Person.objects.filter(is_staff=False).order_by('last_name', 'first_name')
     template_name: str = template.CLIENT_LIST
     title: str = "Seznam klientů"
 
@@ -162,7 +162,7 @@ class ClientListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         page = self.request.GET.get('page', 1)
-        context['page_range'] = self.get_paginator(self.queryset, self.paginate_by).get_elided_page_range(page)
+        context['page_range'] = self.get_paginator(self.queryset, self.paginate_by).get_elided_page_range(page, on_each_side=2)
         return context
 
 

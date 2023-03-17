@@ -34,31 +34,12 @@
 </table>
 {% if object_list.0 %}
 <nav aria-label="Stránkování seznamu klientů">
-    <ul class="pagination">
+    <ul class="pagination justify-content-center">
         {% for page in page_range %}
         <li class="page-item">
-            <a class="page-link" href="?page={{ page }}" aria-label="{{ page }}">{{ page }}</a>
+            <a class="page-link {% if page == page_obj.number %}active{% endif %}" href="?page={{ page }}" aria-label="{{ page }}">{{ page }}</a>
         </li>
         {% endfor %}
-<!--        <li class="page-item">-->
-<!--            <a class="page-link" href="?page=1" aria-label="První">-->
-<!--                <span aria-hidden="true">&laquo;</span>-->
-<!--            </a>-->
-<!--        </li>-->
-<!--        {% if page_obj.has_previous %}-->
-<!--        <li class="page-item">-->
-<!--            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}-->
-<!--            </a>-->
-<!--        </li>{% endif %}-->
-<!--        <li class="page-item"><a class="page-link active" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>-->
-<!--        {% if page_obj.has_next %}-->
-<!--        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>-->
-<!--        {% endif %}-->
-<!--        <li class="page-item">-->
-<!--            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Následující">-->
-<!--                <span aria-hidden="true">&raquo;</span>-->
-<!--            </a>-->
-<!--        </li>-->
     </ul>
 </nav>
 {% endif %}
