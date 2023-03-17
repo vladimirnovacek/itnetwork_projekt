@@ -3,8 +3,6 @@ Handle user permissions (somehow)
     - logged in staff has access to administration menu items
 Add staff functionality
 Make a page footer
-Paginate the list of clients in the administration interface
-    - add a search bar
 ProductDeleteView should be a function
 Add possibility for admin to add staff
 On admin login redirect to different page

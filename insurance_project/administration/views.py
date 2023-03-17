@@ -147,9 +147,15 @@ class ClientListView(generic.ListView):
     """
     model: Model = models.Person
     paginate_by = 10
-    queryset: QuerySet = models.Person.objects.filter(is_staff=False).order_by('last_name', 'first_name')
+    # queryset: QuerySet = models.Person.objects.filter(is_staff=False).order_by('last_name', 'first_name')
     template_name: str = template.CLIENT_LIST
     title: str = "Seznam klientů"
+
+    def get_queryset(self):
+        queryset = models.Person.objects.filter(is_staff=False).order_by('last_name', 'first_name')
+        if 'name-search' in self.request.POST:
+            queryset = queryset.filter(last_name__contains=self.request.POST['name-search'])
+        return queryset
 
     def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
         """
@@ -162,8 +168,13 @@ class ClientListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         page = self.request.GET.get('page', 1)
-        context['page_range'] = self.get_paginator(self.queryset, self.paginate_by).get_elided_page_range(page, on_each_side=2)
+        context['page_range'] = self.get_paginator(self.get_queryset(), self.paginate_by).get_elided_page_range(page, on_each_side=2)
+        if 'name-search' in self.request.POST:
+            context['name_search'] = self.request.POST['name-search']
         return context
+
+    def post(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class ContractsListView(generic.ListView):
