@@ -6,3 +6,4 @@ Make a page footer
 ProductDeleteView should be a function
 Add possibility for admin to add staff
 On admin login redirect to different page
+Remove client on admin client detail is not working

@@ -183,3 +183,21 @@ class Contract(models.Model):
 
     def __str__(self):
         return f"{self.product}, klient: {self.insured}"
+
+
+class InsuredEvent(models.Model):
+    """
+    Model for insured event
+    """
+    contract: Contract = models.ForeignKey(to=Contract, on_delete=models.CASCADE, verbose_name='Smlouva')
+    event_date: models.DateField = models.DateField(verbose_name='Datum události')
+    description: models.TextField = models.TextField(verbose_name='Popis události')
+    approved: models.BooleanField = models.BooleanField(default=False, verbose_name='Schváleno')
+    payout: models.IntegerField = models.IntegerField(null=True, verbose_name='Pojistné plnění')
+
+    @property
+    def client(self):
+        return self.contract.insured
+
+    def __str__(self):
+        return f'Pojistná událost č. {self.pk} ke smlouvě {self.contract}'
