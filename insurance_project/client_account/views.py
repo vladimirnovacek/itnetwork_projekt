@@ -236,14 +236,16 @@ class InsuredEventListView(generic.ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
-        return queryset.filter(contract__insured=self.request.user)
+        return queryset.filter(contract__insured=self.request.user).order_by('reporting_date')
 
     def get(self, request, *args, **kwargs):
-        object_list = self.get_queryset().order_by('reporting_date')
-        pending = object_list.filter(processed=False)
-        processed = object_list.filter(processed=True)
-        return render(request, self.template_name, {"pending": pending, "processed": processed})
+        self.object_list = self.get_queryset()
+        pending = self.object_list.filter(processed=False)
+        processed = self.object_list.filter(processed=True)
+        context = self.get_context_data()
+        context['pending'] = pending
+        context['processed'] = processed
+        return render(request, self.template_name, context)
 
 
 class LoginView(auth_views.LoginView):
