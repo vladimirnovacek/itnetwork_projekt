@@ -1,0 +1,52 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<section>
+    {% if pending.0 %}
+    <h3>Čekající na vyřízení</h3>
+    {% for event in pending %}
+    <div class="container bg-light p-3 border">
+
+        <div class="row ">
+            <div class="col fw-bold">
+                Škodní událost č. {{ event.pk }} ke smlouvě {{ event.contract }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-sm-3">Datum nahlášení</div>
+            <div class="col">{{ event.reporting_date }}</div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% if processed.0 %}
+    <h3>Vyřízené</h3>
+    {% for event in processed %}
+    <div class="container bg-light p-3 border">
+
+        <div class="row ">
+            <div class="col fw-bold">
+                Škodní událost č. {{ event.pk }} ke smlouvě {{ event.contract }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col col-sm-3">Datum nahlášení</div>
+            <div class="col">{{ event.reporting_date }}</div>
+        </div>
+        <div class="row">
+            <div class="col col-sm-3">Schváleno</div>
+            <div class="col">{% if event.approved %}Ano{% else %}Ne{% endif %}</div>
+        </div>
+        {% if event.approved %}<div class="row">
+            <div class="col col-sm-3">
+                Pojistné plnění
+            </div>
+            <div class="col">
+                {{ event.payout }} Kč
+            </div>
+        </div>{% endif %}
+    </div>
+    {% endfor %}
+    {% endif %}
+</section>
+{% endblock %}

@@ -7,8 +7,9 @@
         <p>Roční pojistné: {{ object.payment }} Kč</p>
         <form method="post">
             {% csrf_token %}
-            <button name="edit">Změnit smlouvu</button>
-            <button name="delete">Ukončit smlouvu</button>
+            <a class="btn btn-primary" href="{% url 'event-create' contract_number=object.contract_number %}">Nahlásit pojistnou událost</a>
+            <button class="btn btn-primary" name="edit">Změnit smlouvu</button>
+            <button class="btn btn-primary" name="delete">Ukončit smlouvu</button>
         </form>
     </section>
 {% endblock %}

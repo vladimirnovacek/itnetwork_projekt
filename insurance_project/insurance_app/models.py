@@ -172,6 +172,15 @@ class Contract(models.Model):
         """
         return 10_000_001 + self.pk * 127 ** 2
 
+    @classmethod
+    def get_object_by_contract_number(cls, contract_number: int) -> int:
+        """
+        Returns an object identified by a contract number
+        :param contract_number:
+        :return:
+        """
+        return cls.objects.get(pk=cls.get_pk_by_contract_number(contract_number))
+
     @staticmethod
     def get_pk_by_contract_number(contract_number: int) -> int:
         """
@@ -182,7 +191,7 @@ class Contract(models.Model):
         return int((contract_number - 10_000_001) / (127 ** 2))
 
     def __str__(self):
-        return f"{self.product}, klient: {self.insured}"
+        return f"{self.product} číslo {self.contract_number}"
 
 
 class InsuredEvent(models.Model):
@@ -191,7 +200,9 @@ class InsuredEvent(models.Model):
     """
     contract: Contract = models.ForeignKey(to=Contract, on_delete=models.CASCADE, verbose_name='Smlouva')
     event_date: models.DateField = models.DateField(verbose_name='Datum události')
+    reporting_date: models.DateField = models.DateField(auto_now_add=True)
     description: models.TextField = models.TextField(verbose_name='Popis události')
+    processed: models.BooleanField = models.BooleanField(default=False, verbose_name='Zpracováno')
     approved: models.BooleanField = models.BooleanField(default=False, verbose_name='Schváleno')
     payout: models.IntegerField = models.IntegerField(null=True, verbose_name='Pojistné plnění')
 

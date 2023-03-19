@@ -15,4 +15,6 @@ urlpatterns = [
     path("register-contract/", views.RegisterContractView.as_view(), name="register-contract"),
     path("<int:contract_number>/detail/", views.ContractDetailView.as_view(), name="contract-detail"),
     path("<int:contract_number>/upravit/", views.UpdateContractView.as_view(), name="contract-update"),
+    path("skodni-udalosti/", views.InsuredEventListView.as_view(), name='event-list'),
+    path("<int:contract_number>/nova-udalost/", views.CreateInsuredEventView.as_view(), name='event-create')
 ]

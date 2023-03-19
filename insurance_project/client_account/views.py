@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views, logout as auth_logout
 from django.db.models import RestrictedError, Model, QuerySet
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -184,6 +184,66 @@ class UpdateContractView(generic.UpdateView):
         queryset = super().get_queryset()
         self.kwargs['pk'] = self.model.get_pk_by_contract_number(self.kwargs.get('contract_number'))
         return queryset
+
+
+class CreateInsuredEventView(generic.CreateView):
+    """
+    Create a new insured event
+    """
+    form_class: Form = forms.CreateInsuredEvent
+    template_name: str = template.FORM
+    title: str = 'Nahlášení pojistné události'
+    success_url = reverse_lazy("my-contracts")
+
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param kwargs:
+        :return dict:
+        """
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title
+        return context
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Create new insured event with the corresponding contract
+        :param HttpRequest request:
+        :param args:
+        :param kwargs:
+        :return:
+        :rtype HttpResponse:
+        """
+        contract = models.Contract.get_object_by_contract_number(self.kwargs['contract_number'])
+        insured_event = models.InsuredEvent(contract=contract)
+        form = self.form_class(request.POST, instance=insured_event)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+
+class InsuredEventListView(generic.ListView):
+    model = models.InsuredEvent
+    template_name = template.EVENT_LIST
+    title = 'Seznam pojistných událostí'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['title'] = self.title
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.filter(contract__insured=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        object_list = self.get_queryset().order_by('reporting_date')
+        pending = object_list.filter(processed=False)
+        processed = object_list.filter(processed=True)
+        return render(request, self.template_name, {"pending": pending, "processed": processed})
 
 
 class LoginView(auth_views.LoginView):

@@ -28,6 +28,15 @@ class UpdateContractForm(forms.ModelForm):
         fields: list[str] = ["payment"]
 
 
+class CreateInsuredEvent(forms.ModelForm):
+    """
+    Form for creating a new insured event
+    """
+    class Meta:
+        model: Model = models.InsuredEvent
+        fields: list[str] = ['event_date', 'description']
+
+
 class UpdateUserForm(forms.ModelForm):
     """
     Form for updating client's personal informations
