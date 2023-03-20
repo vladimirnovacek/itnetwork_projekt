@@ -6,44 +6,21 @@
     <h3>Čekající na vyřízení</h3>
     {% for event in pending %}
     <div class="container bg-light p-3 border">
-
-        <div class="row ">
-            <div class="col fw-bold">
-                Škodní událost č. {{ event.pk }} ke smlouvě {{ event.contract }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-sm-3">Datum nahlášení: {{ event.reporting_date }}</div>
-        </div>
+        <h4>Škodní událost č. {{ event.pk }} ke smlouvě {{ event.contract }}</h4>
+        <div><span class="fw-bold">Datum nahlášení:</span> {{ event.reporting_date }}</div>
+        <div><span class="fw-bold">Popis události:</span> {{ event.description }}</div>
     </div>
     {% endfor %}
     {% endif %}
     {% if processed.0 %}
     <h3>Vyřízené</h3>
     {% for event in processed %}
-    <div class="container bg-light p-3 border">
-
-        <div class="row ">
-            <div class="col fw-bold">
-                Škodní událost č. {{ event.pk }} ke smlouvě {{ event.contract }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col col-sm-3">Datum nahlášení</div>
-            <div class="col">{{ event.reporting_date }}</div>
-        </div>
-        <div class="row">
-            <div class="col col-sm-3">Schváleno</div>
-            <div class="col">{% if event.approved %}Ano{% else %}Ne{% endif %}</div>
-        </div>
-        {% if event.approved %}<div class="row">
-            <div class="col col-sm-3">
-                Pojistné plnění
-            </div>
-            <div class="col">
-                {{ event.payout }} Kč
-            </div>
-        </div>{% endif %}
+    <div class="container {% if event.approved %}bg-info{% else %}bg-danger{% endif %} bg-gradient p-3 border">
+        <h4>Škodní událost č. {{ event.pk }} ke smlouvě {{ event.contract }}</h4>
+        <div><span class="fw-bold">Datum nahlášení:</span> {{ event.reporting_date }}</div>
+        <div><span class="fw-bold">Popis události:</span> {{ event.description }}</div>
+        <div><span class="fw-bold">Schváleno:</span> {% if event.approved %}Ano{% else %}Ne{% endif %}</div>
+        {% if event.approved %}<div><span class="fw-bold">Pojistné plnění:</span> {{ event.payout }} Kč</div>{% endif %}
     </div>
     {% endfor %}
     {% endif %}
