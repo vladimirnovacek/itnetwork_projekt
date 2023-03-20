@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views, logout as auth_logout
 from django.db.models import RestrictedError, Model, QuerySet
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -245,7 +245,7 @@ class InsuredEventListView(generic.ListView):
         context = self.get_context_data()
         context['pending'] = pending
         context['processed'] = processed
-        return render(request, self.template_name, context)
+        return self.render_to_response(context)
 
 
 class LoginView(auth_views.LoginView):

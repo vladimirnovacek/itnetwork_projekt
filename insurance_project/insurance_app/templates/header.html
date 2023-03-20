@@ -27,6 +27,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'clients-list' %}">Klienti</a></li>
                                 <li><a class="dropdown-item" href="{% url 'products-list' %}">Produkty</a></li>
+                                <li><a class="dropdown-item" href="{% url 'pending-event-list' %}">Nezpracované pojistné události</a></li>
                             </ul>
                         </li>
                         {% elif user.is_authenticated %}

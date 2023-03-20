@@ -208,6 +208,23 @@ class ContractsListView(generic.ListView):
         return queryset
 
 
+class PendingEventsListView(generic.ListView):
+    """
+    View for displaying all unprocessed insured events
+    """
+    model: models.InsuredEvent = models.InsuredEvent
+    template_name: str = template.PENDING_EVENT_LIST
+    title: str = "Nezpracované pojistné události"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['title'] = self.title
+        return context
+
+    def get_queryset(self):
+        return super().get_queryset().filter(processed=False).order_by('-reporting_date')
+
+
 def delete_person(request: HttpRequest, pk: int) -> HttpResponse:
     """
     View function for deleting a client account

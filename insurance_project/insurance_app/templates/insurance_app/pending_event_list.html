@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+
+{% block content %}
+{% if object_list.0 %}
+<table class="table table-hover">
+    <thead class="table-primary">
+        <tr>
+            <th>Číslo</th>
+            <th>Klient</th>
+            <th>Pojištění</th>
+            <th>Datum nahlášení</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for event in object_list %}
+        <tr>
+            <td>{{ event.pk }}</td>
+            <td>{{ event.client }}</td>
+            <td>{{ event.contract }}</td>
+            <td>{{ event.reporting_date }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}
