@@ -14,7 +14,7 @@
     <tbody>
     {% for event in object_list %}
         <tr>
-            <td>{{ event.pk }}</td>
+            <td><a href="{% url 'event-detail' pk=event.pk %}">{{ event.pk }}</a></td>
             <td>{{ event.client }}</td>
             <td>{{ event.contract }}</td>
             <td>{{ event.reporting_date }}</td>

@@ -168,7 +168,8 @@ class ClientListView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.title
         page = self.request.GET.get('page', 1)
-        context['page_range'] = self.get_paginator(self.get_queryset(), self.paginate_by).get_elided_page_range(page, on_each_side=2)
+        context['page_range'] = self.get_paginator(self.get_queryset(), self.paginate_by)\
+            .get_elided_page_range(page, on_each_side=2)
         if 'name-search' in self.request.POST:
             context['name_search'] = self.request.POST['name-search']
         return context
@@ -194,7 +195,8 @@ class ContractsListView(generic.ListView):
         :return dict:
         """
         context = super().get_context_data(**kwargs)
-        context['title'] = self.title.format(models.Person.objects.get(pk=self.kwargs['pk']))
+        context['pk'] = self.person.pk
+        context['title'] = self.title.format(self.person)
         return context
 
     def get_queryset(self) -> QuerySet:
@@ -202,9 +204,9 @@ class ContractsListView(generic.ListView):
         Filter default queryset by client's primary key
         :return QuerySet:
         """
+        self.person = models.Person.objects.get(pk=self.kwargs['pk'])
         queryset = super().get_queryset()
-        person = models.Person.objects.get(pk=self.kwargs['pk'])
-        queryset = queryset.filter(insured=person)
+        queryset = queryset.filter(insured=self.person)
         return queryset
 
 
@@ -225,6 +227,27 @@ class PendingEventsListView(generic.ListView):
         return super().get_queryset().filter(processed=False).order_by('-reporting_date')
 
 
+class EventDetailView(generic.UpdateView):
+    model = models.InsuredEvent
+    template_name = template.EVENT_DETAIL
+    title = "Škodní událost č. {}"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title.format(self.get_object().pk)
+        return context
+
+    def post(self, request: HttpRequest, *args, **kwargs):
+        self.object: models.InsuredEvent = self.get_object()
+        if 'approve' in request.POST:
+            if not 'payout' in request.POST or not request.POST['payout']:
+                pass
+        elif 'reject' in request.POST:
+            self.object.approved = False
+        else:
+            return self.get(request, *args, **kwargs)
+
+
 def delete_person(request: HttpRequest, pk: int) -> HttpResponse:
     """
     View function for deleting a client account
@@ -242,4 +265,4 @@ def delete_person(request: HttpRequest, pk: int) -> HttpResponse:
         )
     else:
         messages.success(request, 'Klientský účet byl úspěšně odstraněn')
-    return redirect(request.META['HTTP_REFERER'])
+    return redirect('clients-list')

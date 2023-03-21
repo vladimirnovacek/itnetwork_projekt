@@ -1,0 +1,15 @@
+{% extends 'main.html' %}
+
+{% block content %}
+        <div><span class="fw-bold">Klient:</span> {{ object.client }}</div>
+        <div><span class="fw-bold">Smlouva:</span> {{ object.contract }}</div>
+        <div><span class="fw-bold">Datum nahlášení:</span> {{ object.reporting_date }}</div>
+        <div><span class="fw-bold">Popis události:</span> {{ object.description }}</div>
+
+        <form method="post">
+             {% csrf_token %}
+            <input type="number" class="numberinput form-control" name="payout">
+            <button name="approve" class="btn btn-success">Schválit</button>
+            <button name="reject" class="btn btn-danger">Zamítnout</button>
+        </form>
+{% endblock %}

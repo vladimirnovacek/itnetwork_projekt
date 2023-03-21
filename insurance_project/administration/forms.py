@@ -24,3 +24,17 @@ class ProductUpdateForm(forms.ModelForm):
     class Meta:
         model: Model = models.Product
         fields: forms.Field = ['description', 'image']
+
+
+class EventApproveForm(forms.Form):
+    payout = forms.CharField()
+
+    def is_valid(self):
+        pass
+
+
+class EventApproveForm(forms.Form):
+    payout = forms.CharField()
+
+    def is_valid(self):
+        pass

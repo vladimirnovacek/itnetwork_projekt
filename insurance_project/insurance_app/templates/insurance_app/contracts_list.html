@@ -13,6 +13,6 @@
     {% endfor %}
     {% else %}
     <p>Tento klient nemá uzavřenou žádnou smlouvu</p>
-    <a class="btn btn-primary" href="{% url 'client-delete' pk=obj.pk %}">Odstranit klienta</a>
+    <a class="btn btn-primary" href="{% url 'client-delete' pk %}">Odstranit klienta</a>
     {% endif %}
 {% endblock %}
