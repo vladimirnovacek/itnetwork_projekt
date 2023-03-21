@@ -26,15 +26,9 @@ class ProductUpdateForm(forms.ModelForm):
         fields: forms.Field = ['description', 'image']
 
 
-class EventApproveForm(forms.Form):
-    payout = forms.CharField()
+class EventApproveForm(forms.ModelForm):
+    approve = forms.ChoiceField(choices=((1, 'Schválit'), (0, 'Zamítnout')), widget=forms.RadioSelect(), label="")
 
-    def is_valid(self):
-        pass
-
-
-class EventApproveForm(forms.Form):
-    payout = forms.CharField()
-
-    def is_valid(self):
-        pass
+    class Meta:
+        model = models.InsuredEvent
+        fields = ['payout']

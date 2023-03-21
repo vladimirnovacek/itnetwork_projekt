@@ -1,5 +1,7 @@
 {% extends 'main.html' %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
         <div><span class="fw-bold">Klient:</span> {{ object.client }}</div>
         <div><span class="fw-bold">Smlouva:</span> {{ object.contract }}</div>
@@ -8,8 +10,7 @@
 
         <form method="post">
              {% csrf_token %}
-            <input type="number" class="numberinput form-control" name="payout">
-            <button name="approve" class="btn btn-success">Schválit</button>
-            <button name="reject" class="btn btn-danger">Zamítnout</button>
+            {{ form|crispy }}
+            <input type="submit" class="btn btn-success" value="Potvrdit">
         </form>
 {% endblock %}

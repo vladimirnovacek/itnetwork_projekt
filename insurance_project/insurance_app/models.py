@@ -204,7 +204,7 @@ class InsuredEvent(models.Model):
     description: models.TextField = models.TextField(verbose_name='Popis události')
     processed: models.BooleanField = models.BooleanField(default=False, verbose_name='Zpracováno')
     approved: models.BooleanField = models.BooleanField(default=False, verbose_name='Schváleno')
-    payout: models.IntegerField = models.IntegerField(null=True, verbose_name='Pojistné plnění')
+    payout: models.IntegerField = models.IntegerField(null=True, blank=True, verbose_name='Pojistné plnění')
 
     @property
     def client(self):

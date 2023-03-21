@@ -231,21 +231,28 @@ class EventDetailView(generic.UpdateView):
     model = models.InsuredEvent
     template_name = template.EVENT_DETAIL
     title = "Škodní událost č. {}"
+    form_class = forms.EventApproveForm
+    success_url = reverse_lazy('pending-event-list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.title.format(self.get_object().pk)
         return context
 
-    def post(self, request: HttpRequest, *args, **kwargs):
-        self.object: models.InsuredEvent = self.get_object()
-        if 'approve' in request.POST:
-            if not 'payout' in request.POST or not request.POST['payout']:
-                pass
-        elif 'reject' in request.POST:
-            self.object.approved = False
+    def form_valid(self, form: forms.EventApproveForm):
+        if int(form.cleaned_data['approve']):
+            if form.cleaned_data['payout']:
+                form.instance.approved = True
+                form.instance.processed = True
+                form.save()
+            else:
+                form.add_error('payout', 'Payout field is required for approval')
+                return self.form_invalid(form)
         else:
-            return self.get(request, *args, **kwargs)
+            form.instance.approved = False
+            form.instance.processed = True
+            form.save()
+        return super().form_valid(form)
 
 
 def delete_person(request: HttpRequest, pk: int) -> HttpResponse:
