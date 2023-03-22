@@ -227,6 +227,23 @@ class PendingEventsListView(generic.ListView):
         return super().get_queryset().filter(processed=False).order_by('-reporting_date')
 
 
+class ProcessedEventsListView(generic.ListView):
+    """
+        View for displaying all processed insured events
+        """
+    model: models.InsuredEvent = models.InsuredEvent
+    template_name: str = template.PENDING_EVENT_LIST
+    title: str = "Zpracované pojistné události"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['title'] = self.title
+        return context
+
+    def get_queryset(self):
+        return super().get_queryset().filter(processed=True).order_by('-reporting_date')
+
+
 class EventDetailView(generic.UpdateView):
     model = models.InsuredEvent
     template_name = template.EVENT_DETAIL

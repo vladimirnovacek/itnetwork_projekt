@@ -14,5 +14,6 @@ urlpatterns = [
     path('odebrat-produkt/<int:pk>/', views.ProductDeleteView.as_view(), name='product-delete'),
     path('seznam-smluv/<int:pk>/', views.ContractsListView.as_view(), name='contracts-list'),
     path('nezpracovane-pojistne-udalosti/', views.PendingEventsListView.as_view(), name='pending-event-list'),
+    path('zpracovane-pojistne-udalosti/', views.ProcessedEventsListView.as_view(), name='processsed-event-list'),
     path('udalost-<int:pk>/', views.EventDetailView.as_view(), name='event-detail')
 ]

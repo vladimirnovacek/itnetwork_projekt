@@ -161,7 +161,7 @@ class Contract(models.Model):
     objects: models.Manager
     product: models.Field = models.ForeignKey(to=Product, on_delete=models.RESTRICT, verbose_name='Produkt')
     insured: models.Field = models.ForeignKey(to=Person, on_delete=models.RESTRICT, verbose_name='Pojištěnec')
-    conclusion_date: models.Field = models.DateTimeField(auto_now_add=True, verbose_name='Datum uzavření')
+    conclusion_date: models.Field = models.DateField(auto_now_add=True, verbose_name='Datum uzavření')
     payment: models.Field = models.PositiveIntegerField(verbose_name='Pravidelná platba')
 
     @property
