@@ -3,12 +3,14 @@ Views for the client_account app.
 """
 from django.contrib import messages
 from django.contrib.auth import views as auth_views, logout as auth_logout
+from django.contrib.auth.decorators import login_required
 
 from django.db.models import RestrictedError, Model, QuerySet
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import generic
 
 from client_account import forms
@@ -16,6 +18,7 @@ from insurance_app import models
 from insurance_project import template_names as template
 
 
+@method_decorator(login_required, name='get')
 class ContractsListView(generic.ListView):
     """
     View for displaying client's contracts
@@ -46,6 +49,7 @@ class ContractsListView(generic.ListView):
         return queryset
 
 
+@method_decorator(login_required, name='get')
 class RegisterContractView(generic.CreateView):
     """
     View for creating new contract to the client
@@ -87,6 +91,7 @@ class RegisterContractView(generic.CreateView):
             return self.form_invalid(form)
 
 
+@method_decorator(login_required, name='get')
 class ContractDetailView(generic.DetailView):
     """
     View for displaying details of a given contract
@@ -144,6 +149,7 @@ class ContractDetailView(generic.DetailView):
         self.object.delete()
 
 
+@method_decorator(login_required, name='get')
 class UpdateContractView(generic.UpdateView):
     """
     View for updating a contract
@@ -186,6 +192,7 @@ class UpdateContractView(generic.UpdateView):
         return queryset
 
 
+@method_decorator(login_required, name='get')
 class CreateInsuredEventView(generic.CreateView):
     """
     Create a new insured event
@@ -224,6 +231,7 @@ class CreateInsuredEventView(generic.CreateView):
             return self.form_invalid(form)
 
 
+@method_decorator(login_required, name='get')
 class InsuredEventListView(generic.ListView):
     model = models.InsuredEvent
     template_name = template.EVENT_LIST
@@ -255,6 +263,7 @@ class LoginView(auth_views.LoginView):
     next_page = "my-contracts"
 
 
+@method_decorator(login_required, name='get')
 class UpdateUserView(generic.UpdateView):
     """
     View for updating client personal informations
@@ -301,6 +310,7 @@ class UpdateUserView(generic.UpdateView):
             return redirect("my-contracts")
 
 
+@method_decorator(login_required, name='get')
 class PasswordChangeView(auth_views.PasswordChangeView):
     """
     View for a password change
@@ -319,6 +329,7 @@ class PasswordChangeView(auth_views.PasswordChangeView):
         return response
 
 
+@login_required
 def delete_person(request: HttpRequest) -> HttpResponse:
     """
     View function for deleting a client's account

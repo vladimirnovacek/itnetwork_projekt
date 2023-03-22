@@ -2,11 +2,13 @@
 Views for the administration app.
 """
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import RestrictedError, QuerySet, Model
 from django.forms import Form
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import generic
 
 from administration import forms
@@ -14,6 +16,7 @@ from insurance_app import models
 from insurance_project import template_names as template
 
 
+@method_decorator(staff_member_required, name='get')
 class ProductsListView(generic.ListView):
     """
     View displaying products list.
@@ -40,6 +43,7 @@ class ProductsListView(generic.ListView):
         return context
 
 
+@method_decorator(staff_member_required, name='get')
 class ProductCreateView(generic.CreateView):
     """
     View for creating new products
@@ -74,6 +78,7 @@ class ProductCreateView(generic.CreateView):
         return super().post(request, *args, **kwargs)
 
 
+@method_decorator(staff_member_required, name='get')
 class ProductUpdateView(generic.UpdateView):
     """
     View for changing products
@@ -109,6 +114,7 @@ class ProductUpdateView(generic.UpdateView):
         return super().post(request, *args, **kwargs)
 
 
+@method_decorator(staff_member_required, name='get')
 class ProductDeleteView(generic.UpdateView):
     """
     View for marking a product as inactive
@@ -141,6 +147,7 @@ class ProductDeleteView(generic.UpdateView):
         return super().post(request, *args, **kwargs)
 
 
+@method_decorator(staff_member_required, name='get')
 class ClientListView(generic.ListView):
     """
     View for displaying list of clients
@@ -178,6 +185,7 @@ class ClientListView(generic.ListView):
         return super().get(request, *args, **kwargs)
 
 
+@method_decorator(staff_member_required, name='get')
 class ContractsListView(generic.ListView):
     """
     View for displaying contracts of a client given by primary key in the URL
@@ -210,6 +218,7 @@ class ContractsListView(generic.ListView):
         return queryset
 
 
+@method_decorator(staff_member_required, name='get')
 class PendingEventsListView(generic.ListView):
     """
     View for displaying all unprocessed insured events
@@ -227,6 +236,7 @@ class PendingEventsListView(generic.ListView):
         return super().get_queryset().filter(processed=False).order_by('-reporting_date')
 
 
+@method_decorator(staff_member_required, name='get')
 class ProcessedEventsListView(generic.ListView):
     """
         View for displaying all processed insured events
@@ -244,6 +254,7 @@ class ProcessedEventsListView(generic.ListView):
         return super().get_queryset().filter(processed=True).order_by('-reporting_date')
 
 
+@method_decorator(staff_member_required, name='get')
 class EventDetailView(generic.UpdateView):
     model = models.InsuredEvent
     template_name = template.EVENT_DETAIL
@@ -288,6 +299,7 @@ class EventDetailView(generic.UpdateView):
         return super().get(request, *args, **kwargs)
 
 
+@staff_member_required
 def delete_person(request: HttpRequest, pk: int) -> HttpResponse:
     """
     View function for deleting a client account
