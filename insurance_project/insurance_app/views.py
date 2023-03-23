@@ -75,3 +75,7 @@ class RegisterUserView(generic.CreateView):
             return redirect(self.get_success_url())
         else:
             return render(request, self.template_name, {"form": form, 'title': self.title})
+
+
+class AboutView(generic.TemplateView):
+    template_name = template.ABOUT
