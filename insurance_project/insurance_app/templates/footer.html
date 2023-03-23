@@ -1,0 +1,10 @@
+<div class="mt-4"></div><!-- for having footer margin-top at least mt-4 -->
+<footer class="footer mt-auto py-3 bg-light">
+    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item"><a href="{% url 'home' %}" class="nav-link px-2 text-muted">Domů</a></li>
+        <li class="nav-item"><a href="{% if user.is_authenticated %}{% url 'register-contract' %}{% else %}{% url 'register' %}{% endif %}" class="nav-link px-2 text-muted">Založit pojištění</a></li>
+        <li class="nav-item"><a href="{% url 'login' %}" class="nav-link px-2 text-muted">Přihlásit se</a></li>
+        <li class="nav-item"><a href="{% url 'about' %}" class="nav-link px-2 text-muted">O nás</a></li>
+    </ul>
+    <p class="text-center text-muted">© 2023 IamInsurance a.s.</p>
+</footer>

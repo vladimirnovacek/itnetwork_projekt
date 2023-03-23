@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs" >
+<html class="h-100" lang="cs" >
 <head>
     {% load static %}
     <meta charset="UTF-8" />
@@ -12,9 +12,9 @@
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <title>IamInsurance</title>
 </head>
-<body>
+<body class="d-flex flex-column h-100">
     {% include 'header.html' %}
-    <article class="container">
+    <article class="container flex-shrink-0">
         {% for message in messages %}
         <div class="container-fluid p-0">
             <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
@@ -30,5 +30,6 @@
 
     {% endblock %}
     </article>
+{% include 'footer.html' %}
 </body>
 </html>
