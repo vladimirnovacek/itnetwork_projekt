@@ -1,8 +1,8 @@
 """
 Views for the insurance_app
 """
-from django.contrib import messages, auth
-from django.contrib.auth import login, get_user_model
+from django.contrib import messages
+from django.contrib.auth import login, get_user_model, views as auth_views
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.forms import Form
 
@@ -82,3 +82,10 @@ class AboutView(generic.TemplateView):
     View displaying a static 'About us' page
     """
     template_name = template.ABOUT
+
+
+class LoginView(auth_views.LoginView):
+    """
+    The default django login view is used, this class only sets a page where the client is redirected after login
+    """
+    next_page = "my-contracts"

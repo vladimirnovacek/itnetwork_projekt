@@ -48,6 +48,19 @@ class ContractsListView(generic.ListView):
         queryset = queryset.filter(insured=self.request.user)
         return queryset
 
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        If user is staff, redirect to client's list
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        :rtype: HttpResponse
+        """
+        if request.user.is_staff:
+            return redirect('clients-list')
+        return super().get(request, *args, **kwargs)
+
 
 @method_decorator(login_required, name='get')
 class RegisterContractView(generic.CreateView):
@@ -120,6 +133,8 @@ class ContractDetailView(generic.DetailView):
         :return HttpResponse:
         """
         contract_number = kwargs.get('contract_number')
+        if "report" in request.POST:
+            return redirect("event-create", contract_number)
         if "edit" in request.POST:
             return redirect("contract-update", contract_number)
         if "delete" in request.POST:
@@ -264,13 +279,6 @@ class InsuredEventListView(generic.ListView):
         """
         queryset = super().get_queryset()
         return queryset.filter(contract__insured=self.request.user).order_by('reporting_date')
-
-
-class LoginView(auth_views.LoginView):
-    """
-    The default django login view is used, this class only sets a page where the client is redirected after login
-    """
-    next_page = "my-contracts"
 
 
 @method_decorator(login_required, name='get')

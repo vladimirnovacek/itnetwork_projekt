@@ -6,3 +6,4 @@ login page - login button is ugly
 menu - active color is blue
 tables - header and pagination is blue
 Processing insurance events confirmation button is green
+Form submit button has the default text and needs some top margin

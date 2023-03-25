@@ -256,11 +256,11 @@ class PendingEventsListView(generic.ListView):
 
     def get_queryset(self) -> QuerySet:
         """
-        Return pending events sorted by date in descending order.
+        Return pending events sorted by date.
         :return:
         :rtype: QuerySet
         """
-        return super().get_queryset().filter(processed=False).order_by('-reporting_date')
+        return super().get_queryset().filter(processed=False).order_by('reporting_date')
 
 
 @method_decorator(staff_member_required, name='get')
@@ -295,7 +295,7 @@ class ProcessedEventsListView(generic.ListView):
 
 
 @method_decorator(staff_member_required, name='get')
-class EventDetailView(generic.UpdateView):
+class EventUpdateView(generic.UpdateView):
     """
     View for displaying and approving insurance events
     """

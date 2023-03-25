@@ -18,7 +18,12 @@ class PersonAdmin(UserAdmin):
     fieldsets: tuple = (
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('date_of_birth',)}),
-        ('Permissions', {'fields': ('is_superuser',)}),
+        ('Permissions', {'fields': ('is_superuser', 'is_staff')}),
+    )
+    add_fieldsets = (
+        (None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),
+        ('Personal info', {'fields': ('date_of_birth',)}),
+        ('Permissions', {'fields': ('is_superuser', 'is_staff')}),
     )
     ordering = ('email',)
 
