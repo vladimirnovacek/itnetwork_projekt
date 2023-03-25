@@ -87,8 +87,13 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     @property
     def full_address(self) -> str:
+        """
+        Return a full address with comma separated parts of the address
+        :return:
+        :rtype: str
+        """
         chunks = tuple(
-            filter(
+            filter(  # this filter is used for including only nonempty fields
                 lambda c: c,
                 (
                     str(self.address1),
@@ -102,14 +107,33 @@ class Person(AbstractBaseUser, PermissionsMixin):
         return ", ".join(chunks)
 
     def has_perm(self, perm, obj=None) -> bool:
+        """
+        I am not using permissions in this app. All user permissions are determined by is_staff field
+        :param perm:
+        :param obj:
+        :return:
+        """
         return True
 
     def has_module_perms(self, app_label) -> bool:
+        """
+        I am not using permissions in this app. All user permissions are determined by is_staff field
+        :param app_label:
+        :return:
+        """
         return True
 
     def save(
         self, force_insert: bool = False, force_update: bool = False, using: Any = None, update_fields: Any = None
-    ):
+    ) -> None:
+        """
+        Save the instance into the database. Before saving create slug if not given
+        :param force_insert:
+        :param force_update:
+        :param using:
+        :param update_fields:
+        :return:
+        """
         super().save(force_insert, force_update, using, update_fields)
         if not self.slug:
             self.slug = self._generate_slug()
@@ -117,7 +141,7 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     def _generate_slug(self) -> str:
         """
-        Returns an object slug
+        Returns an object's slug
         :return:
         """
         last_name = self._remove_interpunction(str(self.last_name)).lower()

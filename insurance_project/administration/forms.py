@@ -27,6 +27,9 @@ class ProductUpdateForm(forms.ModelForm):
 
 
 class EventApproveForm(forms.ModelForm):
+    """
+    Form for approving insurance events.
+    """
     approve = forms.ChoiceField(choices=((1, 'Schválit'), (0, 'Zamítnout')), widget=forms.RadioSelect(), label="")
 
     class Meta:

@@ -3,3 +3,6 @@ ProductDeleteView should be a function
 Add possibility for admin to add staff
 On admin login redirect to different page
 login page - login button is ugly
+menu - active color is blue
+tables - header and pagination is blue
+Processing insurance events confirmation button is green

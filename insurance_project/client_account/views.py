@@ -233,27 +233,37 @@ class CreateInsuredEventView(generic.CreateView):
 
 @method_decorator(login_required, name='get')
 class InsuredEventListView(generic.ListView):
+    """
+    View for displaying the list of the client's insured events
+    """
     model = models.InsuredEvent
     template_name = template.EVENT_LIST
     title = 'Seznam pojistných událostí'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param kwargs:
+        :return:
+        :rtype: dict
+        """
+        if not object_list:
+            object_list = self.get_queryset()
         context = super().get_context_data(object_list=object_list, **kwargs)
+        context['pending'] = object_list.filter(processed=False)
+        context['processed'] = object_list.filter(processed=True)
         context['title'] = self.title
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Return client's events ordered by date in descending order
+        :return:
+        :rtype: QuerySet
+        """
         queryset = super().get_queryset()
         return queryset.filter(contract__insured=self.request.user).order_by('reporting_date')
-
-    def get(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset()
-        pending = self.object_list.filter(processed=False)
-        processed = self.object_list.filter(processed=True)
-        context = self.get_context_data()
-        context['pending'] = pending
-        context['processed'] = processed
-        return self.render_to_response(context)
 
 
 class LoginView(auth_views.LoginView):

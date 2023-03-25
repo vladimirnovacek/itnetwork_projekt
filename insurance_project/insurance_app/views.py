@@ -78,4 +78,7 @@ class RegisterUserView(generic.CreateView):
 
 
 class AboutView(generic.TemplateView):
+    """
+    View displaying a static 'About us' page
+    """
     template_name = template.ABOUT

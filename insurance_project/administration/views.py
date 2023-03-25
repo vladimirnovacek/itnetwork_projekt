@@ -1,6 +1,8 @@
 """
 Views for the administration app.
 """
+from typing import Any
+
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import RestrictedError, QuerySet, Model
@@ -154,11 +156,15 @@ class ClientListView(generic.ListView):
     """
     model: Model = models.Person
     paginate_by = 10
-    # queryset: QuerySet = models.Person.objects.filter(is_staff=False).order_by('last_name', 'first_name')
     template_name: str = template.CLIENT_LIST
     title: str = "Seznam klientů"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Return the list of clients sorted by name, eventually filtered by the search field value.
+        :return:
+        :rtype: QuerySet
+        """
         queryset = models.Person.objects.filter(is_staff=False).order_by('last_name', 'first_name')
         if 'name-search' in self.request.POST:
             queryset = queryset.filter(last_name__contains=self.request.POST['name-search'])
@@ -181,7 +187,15 @@ class ClientListView(generic.ListView):
             context['name_search'] = self.request.POST['name-search']
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """
+        Return the same response as for the GET method
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        :rtype: HttpResponse
+        """
         return super().get(request, *args, **kwargs)
 
 
@@ -227,42 +241,80 @@ class PendingEventsListView(generic.ListView):
     template_name: str = template.PENDING_EVENT_LIST
     title: str = "Nezpracované pojistné události"
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param QuerySet object_list:
+        :param kwargs:
+        :return:
+        :rtype: dict
+        """
         context = super().get_context_data(object_list=object_list, **kwargs)
         context['title'] = self.title
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Return pending events sorted by date in descending order.
+        :return:
+        :rtype: QuerySet
+        """
         return super().get_queryset().filter(processed=False).order_by('-reporting_date')
 
 
 @method_decorator(staff_member_required, name='get')
 class ProcessedEventsListView(generic.ListView):
     """
-        View for displaying all processed insured events
-        """
+    View for displaying all processed insured events
+    """
     model: models.InsuredEvent = models.InsuredEvent
     template_name: str = template.PENDING_EVENT_LIST
     title: str = "Zpracované pojistné události"
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        :param QuerySet object_list:
+        :param kwargs:
+        :return:
+        :rtype: dict
+        """
         context = super().get_context_data(object_list=object_list, **kwargs)
         context['title'] = self.title
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """
+        Return processed events sorted by date in descending order
+        :return:
+        :rtype: QuerySet
+        """
         return super().get_queryset().filter(processed=True).order_by('-reporting_date')
 
 
 @method_decorator(staff_member_required, name='get')
 class EventDetailView(generic.UpdateView):
+    """
+    View for displaying and approving insurance events
+    """
     model = models.InsuredEvent
     template_name = template.EVENT_DETAIL
     title = "Škodní událost č. {}"
     form_class = forms.EventApproveForm
     success_url = reverse_lazy('pending-event-list')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, object_list: QuerySet = None, **kwargs) -> dict:
+        """
+        Get the context for this view.
+        Extends the parent method with additional context of the page title.
+        Sets the appropriate radio button of the approve form field.
+        :param QuerySet object_list:
+        :param kwargs:
+        :return:
+        :rtype: dict
+        """
         context = super().get_context_data(**kwargs)
         context['title'] = self.title.format(self.get_object().pk)
         form: forms.EventApproveForm = context['form']
@@ -273,12 +325,23 @@ class EventDetailView(generic.UpdateView):
                 form.fields['approve'].initial = 0
         return context
 
-    def get_object(self, queryset=None):
+    def get_object(self, queryset: QuerySet = None) -> Any:
+        """
+        Return the object the view is displaying.
+        :param queryset:
+        :return:
+        """
         if not queryset:
             queryset = self.get_queryset()
         return queryset.get(pk=self.kwargs['pk'])
 
-    def form_valid(self, form: forms.EventApproveForm):
+    def form_valid(self, form: forms.EventApproveForm) -> HttpResponse:
+        """
+        If the form is valid, save the associated model.
+        :param form:
+        :return:
+        :rtype
+        """
         if int(form.cleaned_data['approve']):
             if form.cleaned_data['payout']:
                 form.instance.approved = True
@@ -292,11 +355,6 @@ class EventDetailView(generic.UpdateView):
             form.instance.processed = True
             form.save()
         return super().form_valid(form)
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        return super().get(request, *args, **kwargs)
 
 
 @staff_member_required
