@@ -88,4 +88,5 @@ class LoginView(auth_views.LoginView):
     """
     The default django login view is used, this class only sets a page where the client is redirected after login
     """
+    template_name = template.FORM
     next_page = "my-contracts"
