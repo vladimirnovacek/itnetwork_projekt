@@ -76,7 +76,9 @@ class Person(AbstractBaseUser, PermissionsMixin):
     email: models.Field = models.EmailField(unique=True, verbose_name='E-mail')
     phone: models.Field = modelfields.PhoneNumberField(region="CZ", null=True, verbose_name='Telefon')
     address1: models.Field = models.CharField(max_length=150, default="", verbose_name='Adresa')
-    address2: models.Field = models.CharField(max_length=150, blank=True, default="", verbose_name='Adresa - druhý řádek')
+    address2: models.Field = models.CharField(
+        max_length=150, blank=True, default="", verbose_name='Adresa - druhý řádek'
+    )
     postal_code: models.Field = models.CharField(max_length=12, default="", verbose_name='PSČ')
     city: models.Field = models.CharField(max_length=150, default="", verbose_name='Město')
     country: models.Field = models.CharField(max_length=150, default="", verbose_name='Stát')

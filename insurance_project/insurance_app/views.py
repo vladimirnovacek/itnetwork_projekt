@@ -19,7 +19,7 @@ class IndexView(generic.ListView):
     """
     View for the index page
     """
-    model:models.Product = models.Product
+    model: models.Product = models.Product
     template_name: str = template.HOME
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:

@@ -241,6 +241,7 @@ class CreateInsuredEventView(generic.CreateView):
         insured_event = models.InsuredEvent(contract=contract)
         form = self.form_class(request.POST, instance=insured_event)
         if form.is_valid():
+            messages.success(request, "Pojistná událost byla úspěšně vytvořena")
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -259,6 +260,7 @@ class InsuredEventListView(generic.ListView):
         """
         Get the context for this view.
         Extends the parent method with additional context of the page title.
+        :param object_list:
         :param kwargs:
         :return:
         :rtype: dict

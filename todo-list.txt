@@ -1,9 +1,4 @@
-Make a page footer
 ProductDeleteView should be a function
-Add possibility for admin to add staff
-On admin login redirect to different page
 login page - login button is ugly
-menu - active color is blue
-tables - header and pagination is blue
-Processing insurance events confirmation button is green
 Form submit button has the default text and needs some top margin
+In Add insurance event form, when invalid date is written into the date field, the error is raised
