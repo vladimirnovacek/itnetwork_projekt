@@ -176,7 +176,7 @@ class Product(models.Model):
         return str(self.name) + inactive
 
     class Meta:
-        verbose_name = u'Produkt'
+        verbose_name = 'Produkt'
 
 
 class Contract(models.Model):
